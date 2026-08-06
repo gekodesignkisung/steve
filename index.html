@@ -3,69 +3,119 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>만져보기 전엔 모른다 — 잡스가 시도했을 인터페이스 5종</title>
-<meta name="description" content="스티브 잡스가 시도했을 다섯 가지 조작 은유를 실제로 만져볼 수 있는 인터랙티브 표본실.">
+<title>만져보기 전엔 모른다 — 잡스가 시도했을 인터페이스 8종</title>
+<meta name="description" content="스티브 잡스가 실제로 만든 다섯 가지와 만들었을 법한 세 가지를 직접 만져보는 인터랙티브 표본실.">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
 <header class="masthead">
   <div class="wrap masthead__inner">
-    <div class="mono masthead__tag">인터페이스 표본실 &nbsp;/&nbsp; 조작 은유 <b>5종</b></div>
-    <div class="mono masthead__tag">1976—2011 &nbsp;→&nbsp; 2026</div>
+    <h1 class="mono masthead__tag">스티브잡스 표본실 &nbsp;/&nbsp; 과거 <b>5</b> · 미래 <b>3</b></h1>
+    <span class="mono masthead__tag">1976—2011 &nbsp;→&nbsp; 2026</span>
   </div>
 </header>
 
+<!-- 스크롤 목적지: 탭 바가 화면 맨 위에 물리는 지점 -->
+<div id="tabsTop"></div>
+
+<!-- ===================== 상단 고정 탭 ===================== -->
+<div class="tabsbar">
+  <div class="wrap tabs" role="tablist" aria-label="표본 선택">
+    <button class="tab" type="button" role="tab" id="tab-start" aria-controls="start" aria-selected="true">
+      <span class="tab__name">시작</span>
+    </button>
+
+    <button class="tab" type="button" role="tab" id="tab-fig1" aria-controls="fig1" aria-selected="false" tabindex="-1">
+      <span class="tab__name">휠</span>
+    </button>
+    <button class="tab" type="button" role="tab" id="tab-fig2" aria-controls="fig2" aria-selected="false" tabindex="-1">
+      <span class="tab__name">고무줄</span>
+    </button>
+    <button class="tab" type="button" role="tab" id="tab-fig3" aria-controls="fig3" aria-selected="false" tabindex="-1">
+      <span class="tab__name">끌어다 놓기</span>
+    </button>
+    <button class="tab" type="button" role="tab" id="tab-fig4" aria-controls="fig4" aria-selected="false" tabindex="-1">
+      <span class="tab__name">밀어서 열기</span>
+    </button>
+    <button class="tab" type="button" role="tab" id="tab-fig5" aria-controls="fig5" aria-selected="false" tabindex="-1">
+      <span class="tab__name">바뀌는 자판</span>
+    </button>
+
+    <button class="tab" type="button" role="tab" id="tab-fig6" aria-controls="fig6" aria-selected="false" tabindex="-1">
+      <span class="tab__name">스케일 손잡이</span>
+    </button>
+    <button class="tab" type="button" role="tab" id="tab-fig7" aria-controls="fig7" aria-selected="false" tabindex="-1">
+      <span class="tab__name">명사 후 동사</span>
+    </button>
+    <button class="tab" type="button" role="tab" id="tab-fig8" aria-controls="fig8" aria-selected="false" tabindex="-1">
+      <span class="tab__name">미리 준비된 제안</span>
+    </button>
+  </div>
+</div>
+
 <main class="wrap">
 
-  <!-- ===================== 도입 ===================== -->
-  <section class="hero">
-    <div class="mono hero__eyebrow">읽지 마세요 · 만지세요</div>
-    <h1 class="hero__title">만져보기 전엔 <em>모른다</em></h1>
-    <p class="hero__deck">
-      잡스는 새 기술을 먼저 만든 적이 거의 없습니다. 그가 한 건 <strong>조작 은유가 아직 정해지지 않은 순간</strong>을 골라내는 일이었습니다.
-      마우스, 클릭휠, 멀티터치 — 제품군마다 입력 방식이 하나씩 있었고 그게 제품의 정체성이었습니다.
-      아래 다섯 개는 그 기준을 오늘의 AI 인터페이스에 그대로 적용했을 때 나오는 물건들입니다. 전부 실제로 작동합니다.
-    </p>
+  <!-- 표본 8판이 같은 자리를 나눠 쓴다. 높이는 JS가 가장 높은 판에 맞춘다 -->
+  <div class="panels" id="panels">
 
-    <nav class="index">
-      <a class="index__item" href="#fig1">
-        <span class="mono index__no">FIG. 01</span>
-        <span class="index__name">휠</span>
-        <span class="index__what">엄지 하나로 목록 전체를</span>
-      </a>
-      <a class="index__item" href="#fig2">
-        <span class="mono index__no">FIG. 02</span>
-        <span class="index__name">고무줄</span>
-        <span class="index__what">같은 기능, 다른 감각</span>
-      </a>
-      <a class="index__item" href="#fig3">
-        <span class="mono index__no">FIG. 03</span>
-        <span class="index__name">손잡이</span>
-        <span class="index__what">프롬프트 없이 길이 조절</span>
-      </a>
-      <a class="index__item" href="#fig4">
-        <span class="mono index__no">FIG. 04</span>
-        <span class="index__name">붙은 동사</span>
-        <span class="index__what">명령이 대상 위에 있다</span>
-      </a>
-      <a class="index__item" href="#fig5">
-        <span class="mono index__no">FIG. 05</span>
-        <span class="index__name">이미 끝난 것</span>
-        <span class="index__what">대화 없이 완료 상태로</span>
-      </a>
-    </nav>
+  <!-- ═══════════ 00 · 시작 ═══════════ -->
+  <section class="plate" id="start" role="tabpanel" aria-labelledby="tab-start">
+    <div class="plate__bar">
+      <span class="mono plate__fig">00</span>
+      <span class="mono plate__spec">표본 <b>8종</b></span>
+      <span class="mono plate__spec">과거 <b>5</b> · 미래 <b>3</b></span>
+      <span class="plate__bar-spacer"></span>
+      <span class="mono plate__spec">탭을 눌러 <b>만져보세요</b></span>
+    </div>
+    <div class="plate__body plate__body--start">
+      <div class="quote">
+        <blockquote class="quote__text">디자인은 겉모습이나 느낌이 아닙니다. <em>디자인은 그것이 어떻게 작동하는가입니다.</em></blockquote>
+        <p class="quote__src">
+          <span class="quote__orig" lang="en">“Design is not just what it looks like and feels like. Design is how it works.”</span>
+          <span class="mono quote__by">스티브 잡스 &nbsp;·&nbsp; 뉴욕타임스 매거진 &nbsp;·&nbsp; 2003</span>
+        </p>
+      </div>
+
+      <div class="intro">
+        <nav class="toc" aria-label="표본 목록">
+          <div class="toc__group">
+            <h3 class="mono toc__head">과거 · 그가 실제로 만든 것</h3>
+            <ul class="toc__list">
+              <li><button type="button" class="toc__item" data-goto="fig1"><span class="mono">01</span>휠</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig2"><span class="mono">02</span>고무줄</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig3"><span class="mono">03</span>끌어다 놓기</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig4"><span class="mono">04</span>밀어서 열기</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig5"><span class="mono">05</span>바뀌는 자판</button></li>
+            </ul>
+          </div>
+          <div class="toc__group">
+            <h3 class="mono toc__head">미래 · 그가 만들었을 것</h3>
+            <ul class="toc__list">
+              <li><button type="button" class="toc__item" data-goto="fig6"><span class="mono">06</span>스케일 손잡이</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig7"><span class="mono">07</span>명사 후 동사</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig8"><span class="mono">08</span>미리 준비된 제안</button></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      <figure class="portrait">
+        <img src="image.png" width="863" height="768" alt="스티브 잡스 (1955–2011)">
+      </figure>
+    </div>
   </section>
 
-  <!-- ===================== FIG.01 휠 =====================
-       회전 1축 입력. 각속도가 커질수록 단계 임계각이 줄어드는 가속 모델. -->
-  <section class="plate" id="fig1">
+  <!-- ═══════════ 과거 · 그가 실제로 만든 것 ═══════════ -->
+
+  <!-- FIG.01 휠 — 회전 1축. 각속도가 커질수록 단계 임계각이 줄어든다. -->
+  <section class="plate" id="fig1" role="tabpanel" aria-labelledby="tab-fig1" hidden>
     <div class="plate__bar">
       <span class="mono plate__fig">FIG. 01</span>
       <span class="mono plate__spec">입력 <b>회전 1축</b></span>
       <span class="mono plate__spec">원형 <b>iPod 2001</b></span>
       <span class="plate__bar-spacer"></span>
-      <button class="chip mono" id="sndBtn" aria-pressed="false">소리 켜기</button>
+      <span class="mono plate__spec">휠을 <b>돌려보세요</b></span>
     </div>
     <div class="plate__body">
       <div class="plate__stage">
@@ -96,37 +146,37 @@
           <span>단계 임계 <b id="wThr">14°</b></span>
           <span>이동 <b id="wSteps">0</b>칸</span>
         </div>
+        <div class="nowplaying" id="nowPlaying">
+          <span class="nowplaying__tag">샘플 음원</span>
+          <span>가운데 버튼으로 재생</span>
+        </div>
       </div>
 
       <div class="plate__note">
         <h2 class="plate__title">휠</h2>
         <span class="mono plate__kr">손가락은 직선보다 원을 잘 그린다</span>
         <p>
-          목록이 길수록 스크롤바는 무력해집니다. 1,000곡을 담은 기계에 필요한 건 더 큰 화면이 아니라
-          <strong>회전 속도가 곧 이동 거리가 되는 입력</strong>이었습니다. 천천히 돌리면 한 칸씩, 빠르게 돌리면 수십 칸씩 — 아래 계측기의 임계각이 실시간으로 줄어드는 걸 보세요.
-        </p>
-        <p>
-          그리고 매 칸마다 딸깍 소리가 납니다. 스피커가 아니라 <strong>본체에서</strong> 났습니다. 눈을 감고도 몇 칸을 지났는지 알 수 있도록.
-          기능이 아니라 감각을 설계한 것입니다.
+          1,000곡에 필요한 건 더 큰 화면이 아니라 <strong>회전 속도가 곧 이동 거리가 되는 입력</strong>이었습니다.
+          천천히 돌리면 한 칸, 빠르게 돌리면 수십 칸 — 임계각이 실시간으로 줄어듭니다.
+          딸깍 소리는 스피커가 아니라 본체에서 났습니다. 눈을 감고도 몇 칸을 지났는지 알도록.
         </p>
         <div class="rule"></div>
         <div class="verdict">
           <b>오늘로 옮기면</b>
-          AI 결과가 100개 나올 때 필요한 건 "더 좋은 걸 골라줘"라는 문장이 아니라, 100개를 엄지로 훑는 물리적 감각입니다.
+          결과 100개 중에 고를 때 필요한 건 "더 좋은 걸 골라줘"가 아니라 엄지로 훑는 감각입니다.
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===================== FIG.02 고무줄 =====================
-       동일 데이터·동일 기능의 두 스크롤러. A=관성 없음/경계 즉시 정지, B=관성+고무줄. -->
-  <section class="plate" id="fig2">
+  <!-- FIG.02 고무줄 — 데이터·기능이 같고 손 뗀 뒤의 물리만 다른 두 스크롤러. -->
+  <section class="plate" id="fig2" role="tabpanel" aria-labelledby="tab-fig2" hidden>
     <div class="plate__bar">
       <span class="mono plate__fig">FIG. 02</span>
       <span class="mono plate__spec">입력 <b>드래그 / 플릭</b></span>
       <span class="mono plate__spec">원형 <b>iPhone 2007</b></span>
       <span class="plate__bar-spacer"></span>
-      <span class="mono plate__spec">두 판을 <b>같은 세기로</b> 튕겨보세요</span>
+      <span class="mono plate__spec">두 판을 <b>같은 세기로</b></span>
     </div>
     <div class="plate__body">
       <div class="plate__stage">
@@ -156,31 +206,183 @@
 
       <div class="plate__note">
         <h2 class="plate__title">고무줄</h2>
-        <span class="mono plate__kr">기능표에는 절대 안 적히는 것</span>
+        <span class="mono plate__kr">기능표에는 적히지 않는 것</span>
         <p>
-          두 목록은 <strong>기능이 완전히 같습니다</strong>. 같은 데이터, 같은 스크롤. 차이는 손을 뗀 뒤에 벌어집니다.
-          A는 정직하게 멈추고 벽에서 딱 걸립니다. B는 관성으로 미끄러지고, 끝에서 살짝 늘어났다 되돌아옵니다.
-        </p>
-        <p>
-          늘어났다 돌아오는 그 0.3초는 아무 정보도 주지 않습니다. 다만 <strong>"여기가 끝"이라는 사실을 손가락에 알려줍니다.</strong>
-          잡스가 특허까지 낸 게 이 고무줄이었습니다. 사양서에는 한 줄도 못 적는 종류의 가치입니다.
+          두 목록은 <strong>기능이 완전히 같습니다.</strong> 차이는 손을 뗀 뒤에 벌어집니다.
+          끝에서 늘어났다 돌아오는 0.3초는 아무 정보도 주지 않고, 다만 "여기가 끝"이라는 사실을 손가락에 알려줍니다.
+          잡스가 특허까지 낸 게 이 고무줄이었습니다.
         </p>
         <div class="rule"></div>
         <div class="verdict">
           <b>오늘로 옮기면</b>
-          AI 제품의 승부처는 모델 점수표가 아니라, 결과를 기다리고 고치고 되돌리는 동안의 손끝 감각입니다.
+          승부처는 모델 점수표가 아니라 결과를 고치고 되돌리는 동안의 손끝 감각입니다.
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===================== FIG.03 손잡이 =====================
-       프롬프트 입력 0자. 수직 드래그 46px당 상세도 1단계. -->
-  <section class="plate" id="fig3">
+  <!-- FIG.03 끌어다 놓기 — 1984년이 없앤 것은 mv 명령어였다. -->
+  <section class="plate" id="fig3" role="tabpanel" aria-labelledby="tab-fig3" hidden>
     <div class="plate__bar">
       <span class="mono plate__fig">FIG. 03</span>
+      <span class="mono plate__spec">입력 <b>집어서 놓기</b></span>
+      <span class="mono plate__spec">원형 <b>Macintosh 1984</b></span>
+      <span class="plate__bar-spacer"></span>
+      <button class="chip mono" id="deskReset">책상 정리</button>
+    </div>
+    <div class="plate__body">
+      <div class="plate__stage">
+        <div class="desk">
+          <div class="desk__loose" id="deskLoose"></div>
+          <div class="desk__targets">
+            <div class="drop" id="dropFolder">
+              <span class="drop__glyph">▤</span>
+              <span class="drop__name">프로젝트</span>
+              <span class="mono drop__num" id="foldNum">0</span>
+            </div>
+            <div class="drop drop--bin" id="dropBin">
+              <span class="drop__glyph">⊗</span>
+              <span class="drop__name">휴지통</span>
+              <span class="mono drop__num" id="binNum">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="deadbox deadbox--wide">
+          <span class="deadbox__tag">안 쳐도 됨</span>
+          <span class="deadbox__txt" id="deskCmd"></span>
+        </div>
+        <div class="readout">
+          <span>책상 위 <b id="cntLoose">4</b></span>
+          <span>옮긴 것 <b id="cntMoved">0</b></span>
+        </div>
+      </div>
+
+      <div class="plate__note">
+        <h2 class="plate__title">끌어다 놓기</h2>
+        <span class="mono plate__kr">1984년이 없앤 것은 명령어였다</span>
+        <p>
+          매킨토시 이전에 파일을 옮기려면 <strong>경로와 문법을 외워서 타이핑</strong>해야 했습니다.
+          매킨토시는 그 자리에 손을 넣었습니다. 집어서, 옮기고, 놓는다 — 현실에서 이미 하던 동작 그대로입니다.
+          점선 안에 안 쳐도 되는 명령어가 표시됩니다.
+        </p>
+        <div class="rule"></div>
+        <div class="verdict">
+          <b>오늘로 옮기면</b>
+          AI에게 파일 경로를 문장으로 불러주고 있다면, 우리는 1984년 이전으로 돌아간 것입니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FIG.04 밀어서 열기 — 조작법이 컨트롤 자체에 적혀 있다. -->
+  <section class="plate" id="fig4" role="tabpanel" aria-labelledby="tab-fig4" hidden>
+    <div class="plate__bar">
+      <span class="mono plate__fig">FIG. 04</span>
+      <span class="mono plate__spec">입력 <b>수평 드래그</b></span>
+      <span class="mono plate__spec">원형 <b>iPhone 2007</b></span>
+      <span class="plate__bar-spacer"></span>
+      <span class="mono plate__spec">중간에 놓으면 <b>되돌아옵니다</b></span>
+    </div>
+    <div class="plate__body">
+      <div class="plate__stage">
+        <div class="lockrig">
+          <div class="lockface">
+            <div class="lockface__clock" id="lockClock">9:41</div>
+            <div class="mono lockface__date">2007년 1월 9일 화요일</div>
+            <div class="lock" id="lock">
+              <div class="lock__fill" id="lockFill"></div>
+              <div class="lock__hint" id="lockHint">밀어서 잠금 해제</div>
+              <div class="lock__knob" id="lockKnob" role="slider" tabindex="0"
+                   aria-label="밀어서 잠금 해제" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">&#9654;</div>
+            </div>
+          </div>
+          <div class="lockstate" id="lockState"></div>
+        </div>
+        <div class="readout">
+          <span>진행 <b id="lockPct">0%</b></span>
+          <span>해제 임계 <b>92%</b></span>
+          <span>되돌아온 횟수 <b id="lockBack">0</b></span>
+        </div>
+      </div>
+
+      <div class="plate__note">
+        <h2 class="plate__title">밀어서 열기</h2>
+        <span class="mono plate__kr">조작법이 컨트롤 위에 적혀 있다</span>
+        <p>
+          <strong>사용설명서가 필요 없습니다.</strong> 할 일이 컨트롤 위에 적혀 있고, 왼쪽에서 오른쪽으로 훑는 빛이 방향을 알려줍니다.
+          그리고 <strong>실패가 안전합니다.</strong> 중간에 놓으면 아무 일도 없이 제자리로 돌아옵니다.
+          우연히 열릴 확률은 0에 가깝지만, 열려고 하면 한 번에 열립니다.
+        </p>
+        <div class="rule"></div>
+        <div class="verdict">
+          <b>오늘로 옮기면</b>
+          무엇을 시킬 수 있는지 별도 문서로 알려줘야 한다면, 컨트롤이 제 일을 못 하는 겁니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FIG.05 바뀌는 자판 — 하드웨어 버튼은 못 박히고, 소프트웨어 버튼은 맥락을 따라간다. -->
+  <section class="plate" id="fig5" role="tabpanel" aria-labelledby="tab-fig5" hidden>
+    <div class="plate__bar">
+      <span class="mono plate__fig">FIG. 05</span>
+      <span class="mono plate__spec">입력 <b>맥락 의존 자판</b></span>
+      <span class="mono plate__spec">원형 <b>iPhone 2007</b></span>
+      <span class="plate__bar-spacer"></span>
+      <span class="mono plate__spec">칸을 옮겨가며 <b>자판을 보세요</b></span>
+    </div>
+    <div class="plate__body">
+      <div class="plate__stage">
+        <div class="formrig">
+          <div class="fields" id="fields">
+            <div class="field is-active" data-kbd="text">
+              <span class="field__label">이름</span>
+              <span><span class="field__value" id="fv-name" data-ph="Steve"></span><span class="field__caret"></span></span>
+            </div>
+            <div class="field" data-kbd="email">
+              <span class="field__label">메일</span>
+              <span><span class="field__value" id="fv-mail" data-ph="sj@apple.com"></span><span class="field__caret"></span></span>
+            </div>
+            <div class="field" data-kbd="number">
+              <span class="field__label">카드</span>
+              <span><span class="field__value" id="fv-card" data-ph="4111 1111"></span><span class="field__caret"></span></span>
+            </div>
+          </div>
+
+          <div class="kbd" id="kbd"></div>
+
+          <div class="mono kbdswap">
+            <span>현재 자판 <b id="kbdName">문자</b></span>
+            <span>자판 교체 <b id="kbdSwaps">0</b>회</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="plate__note">
+        <h2 class="plate__title">바뀌는 자판</h2>
+        <span class="mono plate__kr">플라스틱 버튼은 그 자리에 못 박힌다</span>
+        <p>
+          2007년 잡스가 경쟁 제품을 늘어놓고 지적한 건 화면 크기가 아니라 <strong>자판이었습니다.</strong>
+          숫자만 받는 칸에서도 알파벳 40개가 자리를 차지합니다.
+          위 세 칸을 옮겨 다녀 보세요. 메일 칸에서는 <strong>@</strong>와 <strong>.com</strong>이 생기고 스페이스가 사라집니다.
+        </p>
+        <div class="rule"></div>
+        <div class="verdict">
+          <b>오늘로 옮기면</b>
+          모든 작업에 같은 입력창 하나를 내미는 건, 모든 앱에 같은 자판을 못 박아 둔 2006년의 전화기와 같습니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 미래 · 그가 만들었을 것 ═══════════ -->
+
+  <!-- FIG.06 스케일 손잡이 — 프롬프트 입력 0자. 조절기가 결과물에 붙어 있다. -->
+  <section class="plate" id="fig6" role="tabpanel" aria-labelledby="tab-fig6" hidden>
+    <div class="plate__bar">
+      <span class="mono plate__fig">FIG. 06</span>
       <span class="mono plate__spec">입력 <b>수직 드래그</b></span>
-      <span class="mono plate__spec">텍스트 입력 <b>0자</b></span>
+      <span class="mono plate__spec plate__spec--future">구분 <b>아직 없음</b></span>
       <span class="plate__bar-spacer"></span>
       <span class="mono plate__spec">우측 하단 손잡이를 <b>아래로</b></span>
     </div>
@@ -205,33 +407,28 @@
       </div>
 
       <div class="plate__note">
-        <h2 class="plate__title">손잡이</h2>
+        <h2 class="plate__title">스케일 손잡이</h2>
         <span class="mono plate__kr">프롬프트 창은 명령줄로의 회귀다</span>
         <p>
-          빈 텍스트 상자는 사용자에게 <strong>"무엇을 입력해야 하는지 먼저 배우라"</strong>고 요구합니다.
-          잡스가 GUI에 열광한 이유가 정확히 그 반대였습니다. 스타일러스를 두고 그가 한 말을 그대로 옮기면,
-          프롬프트 잘 쓰는 법을 배워야 한다면 그건 이미 진 겁니다.
-        </p>
-        <p>
-          여기서 조절 손잡이는 <strong>결과물 자체에 붙어 있습니다.</strong> 문서를 잡아 늘리면 길어지고, 밀어 올리면 요약됩니다.
-          점선 상자 안에는 같은 일을 시키기 위해 쳐야 했을 문장이 표시됩니다 — 안 쳐도 되는 문장입니다.
+          빈 입력창은 <strong>"무엇을 쳐야 하는지 먼저 배우라"</strong>고 요구합니다.
+          여기서는 조절 손잡이가 결과물 자체에 붙어 있습니다. 잡아 늘리면 길어지고 밀어 올리면 요약됩니다.
+          점선 안의 문장은 같은 일을 시키려면 쳐야 했을 말 — 안 쳐도 되는 말입니다.
         </p>
         <div class="rule"></div>
         <div class="verdict">
-          <b>오늘로 옮기면</b>
-          "더 자세히 써줘"는 명령어입니다. 문서 모서리를 잡아 늘리는 건 조작입니다. 후자만이 결과를 예측 가능하게 만듭니다.
+          <b>그가 만들었다면</b>
+          "더 자세히 써줘"는 명령어, 모서리를 잡아 늘리는 건 조작입니다. 후자만이 결과를 예측 가능하게 만듭니다.
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===================== FIG.04 붙은 동사 =====================
-       명사→동사 순서. 선택한 대상 위에만 가능한 동사가 나타난다. -->
-  <section class="plate" id="fig4">
+  <!-- FIG.07 명사 후 동사 — 명사→동사 순서. 대상 위에만 가능한 동사가 나타난다. -->
+  <section class="plate" id="fig7" role="tabpanel" aria-labelledby="tab-fig7" hidden>
     <div class="plate__bar">
-      <span class="mono plate__fig">FIG. 04</span>
+      <span class="mono plate__fig">FIG. 07</span>
       <span class="mono plate__spec">입력 <b>선택 → 동사</b></span>
-      <span class="mono plate__spec">원형 <b>Macintosh 1984</b></span>
+      <span class="mono plate__spec plate__spec--future">뿌리 <b>Macintosh 1984</b></span>
       <span class="plate__bar-spacer"></span>
       <span class="mono plate__spec">사진이나 문단을 <b>눌러보세요</b></span>
     </div>
@@ -287,127 +484,69 @@
       </div>
 
       <div class="plate__note">
-        <h2 class="plate__title">붙은 동사</h2>
-        <span class="mono plate__kr">명사를 먼저, 동사는 그 위에</span>
+        <h2 class="plate__title">명사 후 동사</h2>
+        <span class="mono plate__kr">고르기 전엔 아무 동사도 없다</span>
         <p>
           매킨토시의 핵심은 마우스가 아니라 <strong>명사–동사 순서</strong>였습니다. 대상을 먼저 고르면
-          그 대상이 할 수 있는 일만 화면에 나타납니다. 외울 명령어가 없고, 불가능한 명령을 내릴 방법도 없습니다.
-        </p>
-        <p>
-          지금의 챗봇은 정반대입니다. 무엇을 시킬 수 있는지 화면 어디에도 안 적혀 있고, 사용자가 동사를 먼저 상상해서 문장으로 만들어야 합니다.
-          <strong>가능성의 목록이 보이지 않는 인터페이스는 GUI 이전으로 돌아간 것입니다.</strong>
+          그 대상이 할 수 있는 일만 나타납니다. 외울 명령어도, 불가능한 명령을 내릴 방법도 없습니다.
+          챗봇은 정반대로, 무엇을 시킬 수 있는지 화면 어디에도 적혀 있지 않습니다.
         </p>
         <div class="rule"></div>
         <div class="verdict">
-          <b>오늘로 옮기면</b>
+          <b>그가 만들었다면</b>
           AI의 능력을 자랑하는 자리는 안내 문구가 아니라, 사용자가 방금 선택한 그 대상 위입니다.
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===================== FIG.05 이미 끝난 것 =====================
-       동일 과제를 대화형(A)과 직접조작(B)으로. 입력 횟수·대기 시간 실측. -->
-  <section class="plate" id="fig5">
+  <!-- FIG.08 미리 준비된 제안 — 묻기 전에 이미 되어 있다. 제안 문구는 전부 사전 작성. -->
+  <section class="plate" id="fig8" role="tabpanel" aria-labelledby="tab-fig8" hidden>
     <div class="plate__bar">
-      <span class="mono plate__fig">FIG. 05</span>
-      <span class="mono plate__spec">비교 <b>대화 vs 직접</b></span>
-      <span class="mono plate__spec">과제 <b>금요일 저녁 예약</b></span>
+      <span class="mono plate__fig">FIG. 08</span>
+      <span class="mono plate__spec">입력 <b>수락 / 버림</b></span>
+      <span class="mono plate__spec plate__spec--future">구분 <b>아직 없음</b></span>
       <span class="plate__bar-spacer"></span>
-      <button class="chip mono" id="resetBtn">둘 다 초기화</button>
+      <button class="chip mono" id="ghostReset">제안 되돌리기</button>
     </div>
     <div class="plate__body">
       <div class="plate__stage">
-        <div class="abpair">
-          <!-- 대화형 -->
-          <div class="panel panel--bad">
-            <div class="mono panel__head"><span>A</span><b>대화로</b></div>
-            <div class="chat" id="chat"></div>
-            <div class="chat__foot" id="chatFoot"></div>
-            <div class="done done--bad">
-              <span class="tally">
-                <span>입력 <b id="tA">0</b>회</span>
-                <span>대기 <b id="wA">0.0</b>초</span>
-              </span>
-            </div>
+        <div class="ghostwrap">
+          <div class="mono ghostwrap__head">
+            <span>보고서 초안</span>
+            <span>고칠 곳이 <b>이미 표시돼 있음</b></span>
           </div>
-
-          <!-- 직접 조작 -->
-          <div class="panel panel--good">
-            <div class="mono panel__head"><span>B</span><b>직접</b></div>
-            <div class="grid5">
-              <div class="grid5__where">
-                <span class="grid5__name">고베규 스테이크하우스</span>
-                <span class="mono plate__spec">8월 7일 <b>금</b></span>
-              </div>
-              <div class="slots" id="slots"></div>
-              <p class="mono plate__spec plate__spec--wrap">
-                빗금 = 이미 찬 자리. 물어보지 않아도 보입니다.
-              </p>
-            </div>
-            <div class="done" id="doneB">
-              <span class="tally">
-                <span>입력 <b id="tB">0</b>회</span>
-                <span>대기 <b id="wB">0.0</b>초</span>
-              </span>
-            </div>
-          </div>
+          <p class="ghostdoc" id="ghostDoc"></p>
+        </div>
+        <div class="readout">
+          <span>대기 <b id="ghostWait">0.0</b>초</span>
+          <span>친 글자 <b id="ghostTyped">0</b>자</span>
+          <span>남은 제안 <b id="ghostLeft">3</b></span>
         </div>
       </div>
 
       <div class="plate__note">
-        <h2 class="plate__title">이미 끝난 것</h2>
-        <span class="mono plate__kr">Siri를 인수한 건 잡스 본인이었다</span>
+        <h2 class="plate__title">미리 준비된 제안</h2>
+        <span class="mono plate__kr">가장 빠른 답변은 답변하지 않는 것</span>
         <p>
-          2010년, 세상을 뜨기 1년 전에 그는 Siri를 사들였습니다. 당시 그가 원한 건 말동무가 아니라
-          <strong>말하면 예약이 끝나 있는 것</strong>이었다고 알려져 있습니다. 지금의 조수들은 여전히 답변을 합니다.
-        </p>
-        <p>
-          왼쪽에서는 시스템이 아는 것을 사용자가 한 번에 하나씩 캐물어야 합니다. 오른쪽에서는
-          <strong>선택지 전체가 처음부터 화면에 있고</strong>, 빈 자리와 찬 자리가 한눈에 보이며, 결정은 한 번의 터치입니다.
-          왼쪽이 네 번 오가는 동안 알아내지 못하는 정보를 오른쪽은 묻기도 전에 보여줍니다.
+          요청도, 대기도 없습니다. 문서를 여는 순간 <strong>고칠 곳이 이미 표시돼 있습니다.</strong>
+          사용자가 하는 일은 문장을 만드는 게 아니라 <strong>고르는 것</strong>뿐입니다 — 파란 쪽을 누르면 바뀌고, ✕를 누르면 사라집니다.
+          제안 문구는 전부 미리 쓰여 있습니다.
         </p>
         <div class="rule"></div>
         <div class="verdict">
-          <b>오늘로 옮기면</b>
-          응답 지연을 예쁘게 감추지 말고, 응답이 필요 없는 구조를 찾으세요. 가장 빠른 답변은 답변하지 않는 것입니다.
+          <b>그가 만들었다면</b>
+          응답 지연을 예쁘게 감추는 대신, 응답이 필요 없는 구조를 찾았을 겁니다.
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===================== 마감 ===================== -->
-  <section class="coda">
-    <div class="coda__grid">
-      <div>
-        <h2 class="coda__h">다만, 낭만은 걷어내고</h2>
-        <p>
-          잡스가 있었어도 지금 애플의 곤경과 크게 다르지 않았을 겁니다. 그의 강점은 발명이 아니라
-          <strong>성숙한 기술을 편집해 완성품으로 만드는 것</strong>이었고, 생성형 AI는 아직 그 단계가 아닙니다.
-        </p>
-        <p>
-          확률적으로 답이 달라지는 시스템은 그가 요구했던 <strong>결정성</strong> — 같은 동작이면 항상 같은 결과 — 과 근본적으로 충돌합니다.
-          아이폰이 2007년에 나온 건 정전식 멀티터치 패널이 그때 겨우 쓸 만해졌기 때문입니다.
-          그는 아마 몇 년 더 기다렸을 것이고, 그동안 "AI는 아직 준비가 안 됐다"는 인터뷰로 조롱당했을 겁니다.
-        </p>
-      </div>
-      <div>
-        <h2 class="coda__h">그가 던졌을 질문 셋</h2>
-        <ul class="qs">
-          <li><b>Q1</b><span>사용자가 아무것도 하지 않을 때, 화면에 무엇이 이미 있어야 하는가? 잠금화면의 슬라이더처럼, 다음 동작이 스스로 보이는 상태인가?</span></li>
-          <li><b>Q2</b><span>지금 있는 기능 중 절반을 지운다면 무엇이 남아야 하는가? 남는 그 하나가 제품의 이름이 되는가?</span></li>
-          <li><b>Q3</b><span>응답 지연을 감추는 대신, 응답이 필요 없게 만들 수 있는가?</span></li>
-        </ul>
-      </div>
-    </div>
-  </section>
+  </div><!-- /.panels -->
 
-  <div class="colophon">
-    <span class="mono">데모 5종 · 실제 동작 · 외부 요청 없음</span>
-    <span class="mono">대화 시뮬레이션은 사전 작성된 스크립트</span>
-  </div>
 </main>
 
+<audio id="track" src="music-sample.mp3" preload="none"></audio>
 <script src="js/app.js"></script>
 </body>
 </html>

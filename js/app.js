@@ -11,17 +11,31 @@
      소리 — 휠 클릭음
      본체에서 나는 딸깍 소리의 재현. 사용자가 켠 뒤에만 컨텍스트를 만든다.
      ========================================================== */
-  var audio = { on: false, ctx: null };
+  var audio = { on: true, ctx: null };     // 기본 켜짐 — 컨텍스트는 첫 조작 때 만들어진다
+  var sndBtn = document.getElementById("sndBtn");
+
+  // 사용자 제스처 이후에만 오디오 컨텍스트를 만든다
+  function ensureCtx() {
+    if (!audio.ctx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audio.ctx = new AC();
+    }
+    if (audio.ctx.state === "suspended") audio.ctx.resume();
+    return audio.ctx;
+  }
+
+  function setSound(on) {
+    audio.on = on;
+    if (!sndBtn) return;                   // 토글 버튼은 없어도 된다 — 소리는 늘 켜져 있다
+    sndBtn.setAttribute("aria-pressed", String(on));
+    sndBtn.textContent = on ? "소리 끄기" : "소리 켜기";
+  }
 
   function click(freq) {
     if (!audio.on) return;
-    if (!audio.ctx) {
-      var AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      audio.ctx = new AC();
-    }
-    var c = audio.ctx;
-    if (c.state === "suspended") c.resume();
+    var c = ensureCtx();
+    if (!c) return;
     var osc = c.createOscillator();
     var gain = c.createGain();
     osc.type = "square";
@@ -35,13 +49,45 @@
     osc.stop(c.currentTime + 0.03);
   }
 
-  var sndBtn = document.getElementById("sndBtn");
-  sndBtn.addEventListener("click", function () {
-    audio.on = !audio.on;
-    sndBtn.setAttribute("aria-pressed", String(audio.on));
-    sndBtn.textContent = audio.on ? "소리 끄기" : "소리 켜기";
-    if (audio.on) click(1600);
-  });
+  if (sndBtn) {
+    sndBtn.addEventListener("click", function () {
+      setSound(!audio.on);
+      if (audio.on) click(1600);
+      else MUSIC.stop();
+    });
+    setSound(audio.on);
+  }
+
+  /* ==========================================================
+     음악 — music-sample.mp3
+     휠 가운데 버튼이 이 파일을 재생한다.
+     ========================================================== */
+  var MUSIC = (function () {
+    var el = document.getElementById("track");
+    var ended = null;
+
+    if (el) {
+      el.volume = 0.85;
+      el.addEventListener("ended", function () { if (ended) ended(); });
+    }
+
+    return {
+      play: function () {
+        if (!el) return false;
+        el.currentTime = 0;
+        var p = el.play();
+        if (p && p.catch) p.catch(function () { /* 브라우저가 막으면 조용히 넘어간다 */ });
+        return true;
+      },
+      stop: function () {
+        if (!el) return;
+        el.pause();
+        el.currentTime = 0;
+      },
+      isOn: function () { return !!el && !el.paused; },
+      onEnded: function (fn) { ended = fn; }
+    };
+  })();
 
   /* ==========================================================
      FIG.01 — 휠
@@ -235,15 +281,49 @@
     else if (k === "End")                             { moveWheel(TRACKS.length);  ev.preventDefault(); }
   });
 
-  wBtn.addEventListener("click", function () {
-    playing = (playing === wIdx) ? -1 : wIdx;
-    wBtn.classList.toggle("is-playing", playing !== -1);
-    wBtn.textContent = playing !== -1 ? "정지" : "선택";
-    click(playing !== -1 ? 1400 : 900);
+  var nowPlaying = document.getElementById("nowPlaying");
+
+  function paintNowPlaying() {
+    nowPlaying.textContent = "";
+    var tag = document.createElement("span");
+    tag.className = "nowplaying__tag";
+    tag.textContent = "샘플 음원";
+    nowPlaying.appendChild(tag);
+
+    var line = document.createElement("span");
+    if (playing === -1) {
+      line.textContent = "가운데 버튼으로 재생";
+    } else {
+      line.appendChild(document.createTextNode("재생 중 "));
+      var b = document.createElement("b");
+      b.textContent = "music-sample.mp3";
+      line.appendChild(b);
+    }
+    nowPlaying.appendChild(line);
+  }
+
+  function setPlaying(idx) {
+    playing = idx;
+    wBtn.classList.toggle("is-playing", idx !== -1);
+    wBtn.textContent = idx !== -1 ? "정지" : "선택";
     paintWheel();
+    paintNowPlaying();
+  }
+
+  wBtn.addEventListener("click", function () {
+    if (playing !== wIdx) {
+      if (!audio.on) setSound(true);
+      if (MUSIC.play()) setPlaying(wIdx);
+    } else {
+      MUSIC.stop();
+      setPlaying(-1);
+    }
   });
 
+  MUSIC.onEnded(function () { setPlaying(-1); });
+
   paintWheel();
+  paintNowPlaying();
 
   /* ==========================================================
      FIG.02 — 관성 & 고무줄
@@ -412,7 +492,7 @@
   });
 
   /* ==========================================================
-     FIG.03 — 손잡이
+     FIG.06 — 스케일 손잡이
      상세도 5단계. 각 단계의 본문과 "안 쳐도 되는 문장"이 짝을 이룬다.
      ========================================================== */
   var LEVELS = [
@@ -503,7 +583,7 @@
   paintHandle();
 
   /* ==========================================================
-     FIG.04 — 붙은 동사
+     FIG.07 — 명사 후 동사
      명사(대상)를 먼저 고르면 그 대상이 할 수 있는 동사만 나타난다.
      점선 상자에는 같은 결과를 얻기 위해 쳐야 했을 문장이 조립된다.
      ========================================================== */
@@ -610,149 +690,567 @@
   paintDoc();
 
   /* ==========================================================
-     FIG.05 — 대화 vs 직접
-     좌: 사전 작성된 대화 스크립트(시뮬레이션). 우: 결정 공간 전체 노출.
-     입력 횟수와 대기 시간은 실측값.
+     FIG.03 — 끌어다 놓기
+     아이콘을 집어 폴더나 휴지통에 넣는다. 명령어를 칠 자리가 아예 없다.
      ========================================================== */
-  var SCRIPT = [
-    { me: "금요일에 저녁 예약하고 싶어", bot: "네, 어느 식당으로 예약할까요?" },
-    { me: "고베규 스테이크하우스",       bot: "몇 분이 방문하시나요?" },
-    { me: "네 명",                       bot: "희망하시는 시간대를 알려주세요." },
-    { me: "저녁 7시쯤",                  bot: "확인해 보니 7시는 만석입니다. 6시 30분 또는 8시가 가능합니다. 어느 쪽으로 할까요?" },
-    { me: "그럼 8시로",                  bot: "8시 4인으로 예약을 완료했습니다." }
+  var deskLoose = document.getElementById("deskLoose");
+  var dropFold  = document.getElementById("dropFolder");
+  var dropBin   = document.getElementById("dropBin");
+  var deskCmd   = document.getElementById("deskCmd");
+  var foldNum   = document.getElementById("foldNum");
+  var binNum    = document.getElementById("binNum");
+  var cntLoose  = document.getElementById("cntLoose");
+  var cntMoved  = document.getElementById("cntMoved");
+  var deskReset = document.getElementById("deskReset");
+
+  var DESK_FILES = [
+    { name: "계획서.txt", glyph: "▤" },
+    { name: "사진.png",   glyph: "▩" },
+    { name: "노래.mp3",   glyph: "♪" },
+    { name: "메모.md",    glyph: "▤" }
   ];
 
-  var chat     = document.getElementById("chat");
-  var chatFoot = document.getElementById("chatFoot");
-  var slotsEl  = document.getElementById("slots");
-  var doneB    = document.getElementById("doneB");
-  var tA = document.getElementById("tA"), wA = document.getElementById("wA");
-  var tB = document.getElementById("tB"), wB = document.getElementById("wB");
+  var inFolder = 0, inBin = 0, moved = 0, dragIcon = null;
 
-  var chatStep = 0, chatTurns = 0, chatT0 = 0, chatWaiting = false;
-
-  function bubble(mod, text) {
-    var b = document.createElement("div");
-    b.className = "bub bub--" + mod;
-    b.textContent = text;
-    chat.appendChild(b);
-    chat.scrollTop = chat.scrollHeight;
-    return b;
+  function deskPaint() {
+    foldNum.textContent = String(inFolder);
+    binNum.textContent = String(inBin);
+    cntLoose.textContent = String(deskLoose.children.length);
+    cntMoved.textContent = String(moved);
   }
 
-  function renderChatFoot() {
-    chatFoot.innerHTML = "";
-    if (chatStep >= SCRIPT.length) {
-      var done = document.createElement("span");
-      done.className = "chat__closed";
-      done.textContent = "예약 완료 · 왕복 " + chatTurns + "회";
-      chatFoot.appendChild(done);
+  function deskSay(cmd) {
+    deskCmd.textContent = cmd || "아이콘을 폴더나 휴지통으로 끌어보세요";
+  }
+
+  function hitBox(el, x, y) {
+    var r = el.getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  }
+
+  function makeIcon(file) {
+    var el = document.createElement("div");
+    el.className = "icon";
+    el.tabIndex = 0;
+    el.setAttribute("role", "button");
+    el.setAttribute("aria-label", file.name + " — 폴더나 휴지통으로 끌어놓기");
+
+    var g = document.createElement("span");
+    g.className = "icon__glyph";
+    g.textContent = file.glyph;
+    var n = document.createElement("span");
+    n.className = "icon__name";
+    n.textContent = file.name;
+    el.appendChild(g);
+    el.appendChild(n);
+
+    el.addEventListener("pointerdown", function (ev) {
+      el.setPointerCapture(ev.pointerId);
+      el.classList.remove("icon--return");
+      el.classList.add("is-lifted");
+      dragIcon = { el: el, file: file, x: ev.clientX, y: ev.clientY };
+      ev.preventDefault();
+    });
+
+    el.addEventListener("pointermove", function (ev) {
+      if (!dragIcon || dragIcon.el !== el) return;
+      el.style.transform =
+        "translate(" + (ev.clientX - dragIcon.x) + "px," + (ev.clientY - dragIcon.y) + "px)";
+      dropFold.classList.toggle("is-over", hitBox(dropFold, ev.clientX, ev.clientY));
+      dropBin.classList.toggle("is-over", hitBox(dropBin, ev.clientX, ev.clientY));
+    });
+
+    function drop(ev) {
+      if (!dragIcon || dragIcon.el !== el) return;
+      try { el.releasePointerCapture(ev.pointerId); } catch (e) { /* 이미 해제됨 */ }
+      el.classList.remove("is-lifted");
+      dropFold.classList.remove("is-over");
+      dropBin.classList.remove("is-over");
+
+      var onFolder = hitBox(dropFold, ev.clientX, ev.clientY);
+      var onBin    = hitBox(dropBin,  ev.clientX, ev.clientY);
+      dragIcon = null;
+
+      if (onFolder || onBin) {
+        if (onFolder) { inFolder++; deskSay("mv " + file.name + " ~/프로젝트/"); }
+        else          { inBin++;    deskSay("rm " + file.name); }
+        moved++;
+        el.remove();
+        click(1750);
+        deskPaint();
+        return;
+      }
+
+      // 아무 데도 아니면 제자리로
+      el.classList.add("icon--return");
+      el.style.transform = "";
+      click(1050);
+    }
+    el.addEventListener("pointerup", drop);
+    el.addEventListener("pointercancel", drop);
+
+    return el;
+  }
+
+  function deskBuild() {
+    deskLoose.textContent = "";
+    DESK_FILES.forEach(function (f) { deskLoose.appendChild(makeIcon(f)); });
+    inFolder = 0; inBin = 0; moved = 0;
+    deskSay("");
+    deskPaint();
+  }
+
+  deskReset.addEventListener("click", deskBuild);
+  deskBuild();
+
+  /* ==========================================================
+     FIG.04 — 밀어서 열기
+     끝까지 밀어야만 열리고, 중간에 놓으면 아무 일도 없이 되돌아온다.
+     ========================================================== */
+  var lock      = document.getElementById("lock");
+  var lockKnob  = document.getElementById("lockKnob");
+  var lockFill  = document.getElementById("lockFill");
+  var lockHint  = document.getElementById("lockHint");
+  var lockState = document.getElementById("lockState");
+  var lockPct   = document.getElementById("lockPct");
+  var lockBack  = document.getElementById("lockBack");
+
+  var LOCK_TH = 0.92;
+  var lockX = 0, lockDrag = null, lockOpen = false, lockBacks = 0, lockRaf = null;
+
+  function lockSpan() {
+    return Math.max(1, lock.clientWidth - lockKnob.offsetWidth - 6);
+  }
+
+  function paintLock() {
+    var p = Math.max(0, Math.min(1, lockX / lockSpan()));
+    lockKnob.style.transform = "translateX(" + lockX.toFixed(1) + "px)";
+    lockFill.style.transform = "scaleX(" + p.toFixed(4) + ")";
+    lockHint.style.opacity = String(Math.max(0, 1 - p * 1.7));
+    lockPct.textContent = Math.round(p * 100) + "%";
+    lockKnob.setAttribute("aria-valuenow", String(Math.round(p * 100)));
+  }
+
+  function lockSay(mode) {
+    lockState.textContent = "";
+    var b = document.createElement("b");
+    if (mode === "open") {
+      b.textContent = "열렸습니다.";
+      lockState.appendChild(b);
+      lockState.appendChild(document.createTextNode(
+        " 손잡이를 누르면 다시 잠깁니다. 주머니 속에서 저절로 여기까지 밀릴 확률은 사실상 0입니다."));
+    } else if (mode === "back") {
+      b.textContent = "되돌아왔습니다.";
+      lockState.appendChild(b);
+      lockState.appendChild(document.createTextNode(
+        " 끝까지 밀지 않으면 아무 일도 일어나지 않습니다. 실패에 대가가 없다는 것이 이 컨트롤의 핵심입니다."));
+    } else {
+      lockState.textContent =
+        "주머니 속에서 저절로 열리지 않으면서, 처음 쥔 사람도 설명 없이 열 수 있어야 했습니다.";
+    }
+  }
+
+  function lockSpring() {
+    if (lockRaf) { cancelAnimationFrame(lockRaf); lockRaf = null; }
+    if (reduce) { lockX = 0; paintLock(); return; }
+    (function tick() {
+      lockX += (0 - lockX) * 0.22;
+      if (lockX < 0.5) { lockX = 0; paintLock(); lockRaf = null; return; }
+      paintLock();
+      lockRaf = requestAnimationFrame(tick);
+    })();
+  }
+
+  function lockSetOpen(on) {
+    lockOpen = on;
+    lock.classList.toggle("is-open", on);
+    lockKnob.textContent = on ? "✓" : "▶";
+    lockX = on ? lockSpan() : 0;
+    paintLock();
+  }
+
+  function lockCommit() {
+    lockDrag = null;
+    lockSetOpen(true);
+    lockSay("open");
+    click(1500);
+    window.setTimeout(function () { click(2050); }, 70);
+  }
+
+  lockKnob.addEventListener("pointerdown", function (ev) {
+    if (lockOpen) { lockSetOpen(false); lockSay(""); click(900); return; }
+    lockKnob.setPointerCapture(ev.pointerId);
+    if (lockRaf) { cancelAnimationFrame(lockRaf); lockRaf = null; }
+    lockDrag = { x: ev.clientX, base: lockX };
+    ev.preventDefault();
+  });
+
+  lockKnob.addEventListener("pointermove", function (ev) {
+    if (!lockDrag) return;
+    lockX = Math.max(0, Math.min(lockSpan(), lockDrag.base + (ev.clientX - lockDrag.x)));
+    paintLock();
+    if (lockX / lockSpan() >= LOCK_TH) lockCommit();
+  });
+
+  function lockRelease(ev) {
+    if (!lockDrag) return;
+    try { lockKnob.releasePointerCapture(ev.pointerId); } catch (e) { /* 이미 해제됨 */ }
+    lockDrag = null;
+    if (lockOpen) return;
+    if (lockX > 6) {
+      lockBacks++;
+      lockBack.textContent = String(lockBacks);
+      lockSay("back");
+    }
+    lockSpring();
+  }
+  lockKnob.addEventListener("pointerup", lockRelease);
+  lockKnob.addEventListener("pointercancel", lockRelease);
+
+  lockKnob.addEventListener("keydown", function (ev) {
+    var span = lockSpan();
+    if (ev.key === "ArrowRight") {
+      ev.preventDefault();
+      lockX = Math.min(span, lockX + span * 0.12);
+      paintLock();
+      if (lockX / span >= LOCK_TH) lockCommit();
+    } else if (ev.key === "ArrowLeft") {
+      ev.preventDefault();
+      lockX = Math.max(0, lockX - span * 0.12);
+      paintLock();
+    } else if (ev.key === "Enter" || ev.key === " ") {
+      ev.preventDefault();
+      if (lockOpen) { lockSetOpen(false); lockSay(""); }
+      else { lockCommit(); }
+    }
+  });
+
+  lockSay("");
+  paintLock();
+
+  /* ==========================================================
+     FIG.08 — 미리 준비된 제안
+     묻기 전에 이미 되어 있다. 사용자는 요청하지 않고 고르기만 한다.
+     제안 문구는 전부 사전에 작성된 것 — 생성 호출은 없다.
+     ========================================================== */
+  var ghostDoc   = document.getElementById("ghostDoc");
+  var ghostLeft  = document.getElementById("ghostLeft");
+  var ghostTyped = document.getElementById("ghostTyped");
+  var ghostWait  = document.getElementById("ghostWait");
+  var ghostReset = document.getElementById("ghostReset");
+
+  // [고정 문구, 제안] 순서로 이어 붙인다
+  var DRAFT = [
+    { fixed: "" },
+    { was: "저희 팀은", now: "우리는" },
+    { fixed: " 이번 분기에 신규 사용자 확보를 위한 " },
+    { was: "다양한 노력을 진행하였으며", now: "세 가지를 했고" },
+    { fixed: ", 그 결과 전월 대비 " },
+    { was: "소폭의 증가가 있었던 것으로 확인되고 있습니다", now: "12% 늘었습니다" },
+    { fixed: "." }
+  ];
+
+  function ghostPaint() {
+    ghostDoc.textContent = "";
+    var left = 0;
+
+    DRAFT.forEach(function (seg, i) {
+      if (seg.fixed !== undefined) {
+        ghostDoc.appendChild(document.createTextNode(seg.fixed));
+        return;
+      }
+      if (seg.done) {
+        var kept = document.createElement("span");
+        kept.className = "ghost__kept";
+        kept.textContent = seg.taken ? seg.now : seg.was;
+        ghostDoc.appendChild(kept);
+        return;
+      }
+
+      left++;
+      var wrap = document.createElement("span");
+      wrap.className = "ghost";
+
+      var was = document.createElement("span");
+      was.className = "ghost__was";
+      was.textContent = seg.was;
+
+      var now = document.createElement("button");
+      now.type = "button";
+      now.className = "ghost__now";
+      now.textContent = seg.now;
+      now.setAttribute("aria-label", "“" + seg.was + "” 를 “" + seg.now + "” 로 바꾸기");
+      now.addEventListener("click", function () {
+        seg.done = true; seg.taken = true;
+        click(1900);
+        ghostPaint();
+      });
+
+      var no = document.createElement("button");
+      no.type = "button";
+      no.className = "ghost__no";
+      no.textContent = "✕";
+      no.setAttribute("aria-label", "이 제안 버리기");
+      no.addEventListener("click", function () {
+        seg.done = true; seg.taken = false;
+        click(1100);
+        ghostPaint();
+      });
+
+      wrap.appendChild(was);
+      wrap.appendChild(now);
+      wrap.appendChild(no);
+      ghostDoc.appendChild(wrap);
+    });
+
+    ghostLeft.textContent = String(left);
+  }
+
+  ghostReset.addEventListener("click", function () {
+    DRAFT.forEach(function (s) { s.done = false; s.taken = false; });
+    click(1400);
+    ghostPaint();
+  });
+
+  ghostTyped.textContent = "0";
+  ghostWait.textContent = "0.0";
+  ghostPaint();
+
+  /* ==========================================================
+     FIG.05 — 바뀌는 자판
+     칸이 무엇을 받느냐에 따라 자판 자체가 교체된다.
+     ========================================================== */
+  var kbd      = document.getElementById("kbd");
+  var kbdName  = document.getElementById("kbdName");
+  var kbdSwaps = document.getElementById("kbdSwaps");
+  var fields   = [].slice.call(document.querySelectorAll(".field"));
+
+  var LAYOUTS = {
+    text: {
+      name: "문자", max: 18,
+      rows: [
+        "QWERTYUIOP".split(""),
+        "ASDFGHJKL".split(""),
+        [{ t: "⇧", act: "shift", cls: "key--util" }]
+          .concat("ZXCVBNM".split(""), [{ t: "⌫", act: "back", cls: "key--util" }]),
+        [{ t: "공백", act: "space", cls: "key--wide key--util" },
+         { t: "다음", act: "done", cls: "key--go" }]
+      ]
+    },
+    email: {
+      name: "메일", max: 30,
+      rows: [
+        "QWERTYUIOP".split(""),
+        "ASDFGHJKL".split(""),
+        [{ t: "⇧", act: "shift", cls: "key--util" }]
+          .concat("ZXCVBNM".split(""), [{ t: "⌫", act: "back", cls: "key--util" }]),
+        // 스페이스가 사라진 자리에 맥락 키가 들어온다
+        [{ t: "@", act: "ins", v: "@", cls: "key--ctx" },
+         { t: ".", act: "ins", v: ".", cls: "key--ctx" },
+         { t: ".com", act: "ins", v: ".com", cls: "key--ctx key--wide" },
+         { t: "다음", act: "done", cls: "key--go" }]
+      ]
+    },
+    number: {
+      name: "숫자", max: 19,
+      rows: [
+        ["1", "2", "3"], ["4", "5", "6"], ["7", "8", "9"],
+        [{ t: "⌫", act: "back", cls: "key--util" }, "0",
+         { t: "완료", act: "done", cls: "key--go" }]
+      ]
+    }
+  };
+
+  var kbdShift = true, kbdKind = "text", kbdSwapCount = 0;
+  var activeField = fields[0];
+
+  function isLetter(ch) { return /^[A-Za-z]$/.test(ch); }
+
+  function renderKbd() {
+    var L = LAYOUTS[kbdKind];
+    kbd.textContent = "";
+    L.rows.forEach(function (row) {
+      var r = document.createElement("div");
+      r.className = "kbd__row";
+      row.forEach(function (spec) {
+        var s = (typeof spec === "string") ? { t: spec, act: "ins", v: spec } : spec;
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "key" + (s.cls ? " " + s.cls : "");
+        b.dataset.act = s.act;
+        b.dataset.v = (s.v !== undefined ? s.v : s.t);
+        b.textContent = (s.act === "ins" && isLetter(s.t) && !kbdShift) ? s.t.toLowerCase() : s.t;
+        if (s.act === "shift") b.setAttribute("aria-pressed", String(kbdShift));
+        r.appendChild(b);
+      });
+      kbd.appendChild(r);
+    });
+    kbdName.textContent = L.name;
+  }
+
+  function groupCard(digits) {
+    return digits.replace(/\D/g, "").slice(0, 16).replace(/(.{4})(?=.)/g, "$1 ");
+  }
+
+  function fieldValueEl(f) { return f.querySelector(".field__value"); }
+
+  function setActiveField(f, countSwap) {
+    activeField = f;
+    fields.forEach(function (x) { x.classList.toggle("is-active", x === f); });
+    var kind = f.dataset.kbd;
+    if (kind !== kbdKind) {
+      kbdKind = kind;
+      kbdShift = (kind !== "number") && !fieldValueEl(f).textContent;
+      if (countSwap) {
+        kbdSwapCount++;
+        kbdSwaps.textContent = String(kbdSwapCount);
+      }
+    }
+    renderKbd();
+  }
+
+  function kbdPress(act, v) {
+    var el = fieldValueEl(activeField);
+    var cur = el.textContent;
+    var max = LAYOUTS[kbdKind].max;
+
+    if (act === "shift") { kbdShift = !kbdShift; renderKbd(); click(1200); return; }
+
+    if (act === "done") {
+      var next = fields[(fields.indexOf(activeField) + 1) % fields.length];
+      setActiveField(next, true);
+      click(1500);
       return;
     }
-    var b = document.createElement("button");
-    b.className = "chip chip--say";
-    b.textContent = "“" + SCRIPT[chatStep].me + "”";
-    b.addEventListener("click", sendChat);
-    chatFoot.appendChild(b);
-  }
 
-  function sendChat() {
-    if (chatWaiting || chatStep >= SCRIPT.length) return;
-    if (!chatT0) chatT0 = performance.now();
-
-    var step = SCRIPT[chatStep];
-    bubble("me", step.me);
-    chatTurns++;
-    tA.textContent = String(chatTurns);
-    chatWaiting = true;
-    chatFoot.innerHTML = "";
-
-    var wait = bubble("wait", "응답 대기 중…");
-    var delay = reduce ? 260 : 620 + chatStep * 190;
-
-    window.setTimeout(function () {
-      wait.remove();
-      bubble("bot", step.bot);
-      chatStep++;
-      chatWaiting = false;
-      wA.textContent = ((performance.now() - chatT0) / 1000).toFixed(1);
-      renderChatFoot();
-    }, delay);
-  }
-
-  // 좌석표: 시간 × 인원. 만석 정보는 묻기 전에 이미 화면에 있다.
-  var TIMES = ["18:00", "18:30", "19:00", "19:30"];
-  var PARTY = [2, 3, 4];
-  var TAKEN = { "19:00|4": true, "19:00|3": true, "18:30|2": true, "19:30|4": true };
-
-  function buildSlots() {
-    slotsEl.innerHTML = "";
-    slotsEl.appendChild(document.createElement("div"));   // 좌상단 빈칸
-
-    TIMES.forEach(function (t) {
-      var h = document.createElement("div");
-      h.className = "slots__h";
-      h.textContent = t;
-      slotsEl.appendChild(h);
-    });
-
-    PARTY.forEach(function (p) {
-      var r = document.createElement("div");
-      r.className = "slots__r";
-      r.textContent = p + "인";
-      slotsEl.appendChild(r);
-
-      TIMES.forEach(function (t) {
-        var taken = !!TAKEN[t + "|" + p];
-        var b = document.createElement("button");
-        b.className = "slot";
-        b.type = "button";
-        b.disabled = taken;
-        b.textContent = taken ? "만석" : "예약";
-        b.setAttribute("aria-label", t + " " + p + "인 " + (taken ? "만석" : "예약 가능"));
-        b.addEventListener("click", function () {
-          if (b.classList.contains("is-done")) return;
-          slotsEl.querySelectorAll(".slot").forEach(function (x) {
-            x.classList.remove("is-done");
-            if (!x.disabled) x.textContent = "예약";
-          });
-          b.classList.add("is-done");
-          b.textContent = "완료";
-          click(1700);
-          tB.textContent = "1";
-          wB.textContent = "0.0";
-          setResult(t + " · " + p + "인 예약됨");
-        });
-        slotsEl.appendChild(b);
-      });
-    });
-  }
-
-  function setResult(text) {
-    var r = doneB.querySelector(".done__result");
-    if (!r) {
-      r = document.createElement("span");
-      r.className = "done__result";
-      doneB.appendChild(r);
+    if (act === "back") {
+      el.textContent = kbdKind === "number" ? groupCard(cur.slice(0, -1)) : cur.slice(0, -1);
+    } else if (act === "space") {
+      if (cur.length < max && cur.slice(-1) !== " ") el.textContent = cur + " ";
+    } else {
+      var ch = v;
+      if (isLetter(ch)) ch = kbdShift ? ch.toUpperCase() : ch.toLowerCase();
+      if (cur.length + ch.length <= max) {
+        el.textContent = kbdKind === "number" ? groupCard(cur + ch) : cur + ch;
+      }
+      if (kbdShift && isLetter(v)) { kbdShift = false; renderKbd(); }   // 한 글자만 대문자
     }
-    r.textContent = text;
+    click(1850);
   }
 
-  function resetAll() {
-    chat.innerHTML = "";
-    chatStep = 0; chatTurns = 0; chatT0 = 0; chatWaiting = false;
-    tA.textContent = "0";
-    wA.textContent = "0.0";
-    bubble("bot", "안녕하세요. 무엇을 도와드릴까요?");
-    renderChatFoot();
+  kbd.addEventListener("click", function (ev) {
+    var b = ev.target.closest(".key");
+    if (!b) return;
+    kbdPress(b.dataset.act, b.dataset.v);
+  });
 
-    tB.textContent = "0";
-    wB.textContent = "0.0";
-    var r = doneB.querySelector(".done__result");
-    if (r) r.remove();
-    buildSlots();
+  fields.forEach(function (f) {
+    f.addEventListener("click", function () { setActiveField(f, true); });
+  });
+
+  setActiveField(fields[0], false);
+
+  /* ==========================================================
+     상단 고정 탭 — 누르면 해당 표본이 바로 아래에 열린다
+     ========================================================== */
+  var tabEls  = [].slice.call(document.querySelectorAll(".tab"));
+  var panels  = tabEls.map(function (t) { return document.getElementById(t.getAttribute("aria-controls")); });
+  var tabsTop = document.getElementById("tabsTop");
+  var panelBox = document.getElementById("panels");
+
+  /* 판마다 내용 분량이 달라 높이가 제각각이다.
+     가장 높은 판을 실측해 모든 판을 그 높이로 맞춘다 — 탭을 눌러도 상자가 안 덜컹거리도록.
+     레이아웃만 읽고 페인트 전에 원상복구하므로 깜빡임은 없다. */
+  function lockPanelHeight() {
+    if (!panelBox) return;
+    var was = panels.map(function (p) { return p.hidden; });
+    var paperWas = paper.style.minHeight;
+    var tallest = 0;
+
+    // 손잡이는 끝까지 늘렸을 때가 가장 높다 — 그 상태로 재야 나중에 넘치지 않는다
+    paper.style.minHeight = (140 + (LEVELS.length - 1) * 46) + "px";
+    panels.forEach(function (p) { p.style.minHeight = "0px"; });
+
+    panels.forEach(function (p) {
+      panels.forEach(function (q) { q.hidden = (q !== p); });
+      tallest = Math.max(tallest, p.offsetHeight);
+    });
+
+    panels.forEach(function (p, i) {
+      p.hidden = was[i];
+      p.style.minHeight = tallest + "px";
+    });
+    paper.style.minHeight = paperWas;
   }
 
-  document.getElementById("resetBtn").addEventListener("click", resetAll);
-  resetAll();
+  var heightQueued = false;
+  function queueHeight() {
+    if (heightQueued) return;
+    heightQueued = true;
+    requestAnimationFrame(function () { heightQueued = false; lockPanelHeight(); });
+  }
+  window.addEventListener("resize", queueHeight);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(lockPanelHeight);
+
+  // 다시 보일 때 폭을 다시 재야 하는 표본들
+  var ON_SHOW = { fig4: paintLock };
+
+  function showTab(i, doScroll) {
+    // 휠 표본을 떠나면 소리도 함께 멈춘다
+    if (panels[i] && panels[i].id !== "fig1" && MUSIC.isOn()) {
+      MUSIC.stop();
+      playing = -1;
+      wBtn.classList.remove("is-playing");
+      wBtn.textContent = "선택";
+      paintWheel();
+      paintNowPlaying();
+    }
+
+    tabEls.forEach(function (t, k) {
+      var on = (k === i);
+      t.setAttribute("aria-selected", String(on));
+      t.tabIndex = on ? 0 : -1;
+      if (panels[k]) panels[k].hidden = !on;
+    });
+
+    var id = panels[i] ? panels[i].id : null;
+    if (id) {
+      if (window.history && history.replaceState) history.replaceState(null, "", "#" + id);
+      if (ON_SHOW[id]) ON_SHOW[id]();
+    }
+    if (doScroll && tabsTop) {
+      tabsTop.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
+    }
+  }
+
+  tabEls.forEach(function (t, i) {
+    t.addEventListener("click", function () { showTab(i, true); click(1700); });
+    t.addEventListener("keydown", function (ev) {
+      var d = ev.key === "ArrowRight" ? 1 : (ev.key === "ArrowLeft" ? -1 : 0);
+      if (!d) return;
+      ev.preventDefault();
+      var n = (i + d + tabEls.length) % tabEls.length;
+      tabEls[n].focus();
+      showTab(n, false);
+    });
+  });
+
+  // 시작 판의 목차에서 바로 해당 표본으로
+  [].slice.call(document.querySelectorAll("[data-goto]")).forEach(function (b) {
+    b.addEventListener("click", function () {
+      for (var i = 0; i < panels.length; i++) {
+        if (panels[i] && panels[i].id === b.dataset.goto) { showTab(i, true); click(1700); return; }
+      }
+    });
+  });
+
+  // 주소창 해시로 바로 들어온 경우 해당 표본을 연다
+  var start = 0;
+  if (location.hash) {
+    for (var pi = 0; pi < panels.length; pi++) {
+      if (panels[pi] && "#" + panels[pi].id === location.hash) { start = pi; break; }
+    }
+  }
+  showTab(start, false);
+  lockPanelHeight();
 })();
