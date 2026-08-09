@@ -1056,9 +1056,23 @@ h1.masthead__tag { font-size: .75rem; }
 }
 .plate__body--start .intro { margin-top: 28px; }
 
+/* 좁은 화면에서는 배경 배치를 풀고 위아래로 쌓는다.
+   사진이 절대 배치인 채로 남으면 글 위를 덮는다. */
 @media (max-width: 860px) {
-  .plate__body--start { min-height: 0; overflow: visible; }
+  .plate__body--start {
+    min-height: 0;
+    overflow: visible;
+    padding-right: clamp(16px, 3vw, 32px);
+    padding-bottom: clamp(20px, 3vw, 32px);
+    border-bottom-right-radius: 0;
+  }
   .plate__body--start .intro { padding-bottom: 0; }
+  .plate__body--start .portrait {
+    position: static;
+    width: 100%;
+    max-width: 400px;
+    margin: 24px auto 0;
+  }
 }
 
 /* 사진의 흰 배경과 표본판 바탕(--surface)이 같은 값이라 경계가 안 보인다.
@@ -1264,7 +1278,9 @@ h1.masthead__tag { font-size: .75rem; }
   color: var(--ink);
 }
 
-.ghost { white-space: nowrap; }
+/* 묶음 전체를 nowrap으로 두면 상자 밖으로 밀린다.
+   원문은 줄바꿈을 허용하고, 알약+동그라미만 붙여 둔다. */
+.ghost { white-space: normal; }
 
 /* 원문은 지워질 후보로 남겨 둔다 */
 .ghost__was {
@@ -1281,10 +1297,13 @@ h1.masthead__tag { font-size: .75rem; }
   align-items: center;
   gap: 5px;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 .ghost__now {
   font: inherit;
+  max-width: 100%;
+  white-space: normal;
   border: 1px solid var(--accent);
   border-radius: 999px;
   background: var(--accent-wash);
@@ -1383,6 +1402,7 @@ h1.masthead__tag { font-size: .75rem; }
   font-size: clamp(1.0625rem, 1.6vw, 1.3125rem);
   line-height: 2;
   letter-spacing: -.015em;
+  overflow-wrap: break-word;
   color: var(--ink);
 }
 
@@ -1522,6 +1542,63 @@ h1.masthead__tag { font-size: .75rem; }
 .ver__lost { color: var(--ink-3); }
 .ver--bad  .ver__lost b { color: var(--friction); }
 .ver--good .ver__lost b { color: var(--accent); }
+
+/* ============================================================
+   좁은 화면 — 손가락으로 쓰는 조건
+   ============================================================ */
+/* 탭이 화면보다 길어지는 구간 — 밀어서 고른다.
+   .wrap의 좌우 여백은 안쪽 패딩으로 옮겨, 스크롤이 화면 끝까지 닿게 한다. */
+@media (max-width: 860px) {
+  .tabs {
+    max-width: none;
+    padding-left: var(--gut);
+    padding-right: var(--gut);
+    scroll-padding-inline: var(--gut);
+  }
+  .tab {
+    flex: 0 0 auto;               /* 폭은 이름에 맡긴다 — 잘리지 않게 */
+    min-width: 0;
+    padding: 11px 14px 12px;
+  }
+}
+
+@media (max-width: 720px) {
+  /* 휠은 두 덩이가 위아래로 */
+  .wheelrig { flex-direction: column; }
+  .screen { width: 100%; max-width: 100%; }
+
+  /* 표본 이름이 화면을 다 먹지 않도록 */
+  .plate__title { font-size: clamp(1.7rem, 7vw, 2.1rem); }
+
+  /* 판 위쪽 사양 줄이 여러 줄로 접히는 걸 허용 */
+  .plate__bar { min-height: 0; padding-top: 8px; padding-bottom: 8px; }
+}
+
+@media (max-width: 480px) {
+  /* 자판은 키가 작아지므로 높이도 함께 줄인다 */
+  .kbd { min-height: 0; padding: 9px 7px; gap: 6px; }
+  .kbd__row { gap: 4px; }
+  .key { height: 40px; font-size: var(--t-xs); }
+  .key--ctx { font-size: 10px; }
+
+  /* 파일 아이콘은 한 줄에 세 개 */
+  .icon { width: 30%; }
+  .desk__loose { min-height: 150px; }
+
+  /* 답변·문서 상자는 세로 여유를 줄인다 */
+  .answer { min-height: 0; }
+  .ghostdoc { min-height: 0; line-height: 2.2; }
+  .ver { min-height: 0; }
+
+  /* 잠금화면은 화면 폭에 맞춘다 */
+  .lockface { min-height: clamp(320px, 78vw, 380px); padding-top: 40px; }
+
+  /* 목록 두 판은 조금 낮게 */
+  .scroller__view { height: 300px; }
+
+  /* 서명은 가운데로 — 오른쪽 끝에 붙으면 잘려 보인다 */
+  .signature { text-align: center; }
+}
 
 /* ---------- 접근성 ---------- */
 @media (prefers-reduced-motion: reduce) {

@@ -1469,6 +1469,17 @@
   // 다시 보일 때 폭을 다시 재야 하는 표본들
   var ON_SHOW = { fig4: paintLock };
 
+  /* 탭 바가 화면보다 길면 고른 탭이 밖에 있을 수 있다.
+     가로로 밀어 가운데로 데려온다 — 세로 스크롤은 건드리지 않는다. */
+  function revealTab(el) {
+    var strip = el.parentElement;
+    if (!strip || strip.scrollWidth <= strip.clientWidth) return;
+    var left = el.offsetLeft - (strip.clientWidth - el.offsetWidth) / 2;
+    left = Math.max(0, Math.min(left, strip.scrollWidth - strip.clientWidth));
+    if (strip.scrollTo) strip.scrollTo({ left: left, behavior: reduce ? "auto" : "smooth" });
+    else strip.scrollLeft = left;
+  }
+
   function showTab(i, doScroll) {
     // 휠 표본을 떠나면 소리도 함께 멈춘다
     if (panels[i] && panels[i].id !== "fig1" && MUSIC.isOn()) {
@@ -1486,6 +1497,8 @@
       t.tabIndex = on ? 0 : -1;
       if (panels[k]) panels[k].hidden = !on;
     });
+
+    revealTab(tabEls[i]);
 
     var id = panels[i] ? panels[i].id : null;
     if (id) {
