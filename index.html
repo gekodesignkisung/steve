@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>만져보기 전엔 모른다 — 잡스가 시도했을 인터페이스 8종</title>
-<meta name="description" content="스티브 잡스가 실제로 만든 다섯 가지와 만들었을 법한 세 가지를 직접 만져보는 인터랙티브 표본실.">
+<title>스티브 잡스가 만들었던, 그리고 만들었을 인터페이스 표본들</title>
+<meta name="description" content="그가 실제로 만든 여섯 가지와 만들었을 법한 네 가지. 열 개의 조작 은유를 읽지 않고 직접 만져보는 표본실.">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
 <header class="masthead">
   <div class="wrap masthead__inner">
-    <h1 class="mono masthead__tag">스티브잡스 표본실 &nbsp;/&nbsp; 과거 <b>5</b> · 미래 <b>3</b></h1>
+    <h1 class="mono masthead__tag">스티브 잡스가 만들었던, 그리고 <b>만들었을</b> 인터페이스 표본들</h1>
     <span class="mono masthead__tag">1976—2011 &nbsp;→&nbsp; 2026</span>
   </div>
 </header>
@@ -30,7 +30,7 @@
       <span class="tab__name">휠</span>
     </button>
     <button class="tab" type="button" role="tab" id="tab-fig2" aria-controls="fig2" aria-selected="false" tabindex="-1">
-      <span class="tab__name">고무줄</span>
+      <span class="tab__name">바운스</span>
     </button>
     <button class="tab" type="button" role="tab" id="tab-fig3" aria-controls="fig3" aria-selected="false" tabindex="-1">
       <span class="tab__name">끌어다 놓기</span>
@@ -42,59 +42,66 @@
       <span class="tab__name">바뀌는 자판</span>
     </button>
 
-    <button class="tab" type="button" role="tab" id="tab-fig6" aria-controls="fig6" aria-selected="false" tabindex="-1">
-      <span class="tab__name">스케일 손잡이</span>
-    </button>
     <button class="tab" type="button" role="tab" id="tab-fig7" aria-controls="fig7" aria-selected="false" tabindex="-1">
       <span class="tab__name">명사 후 동사</span>
     </button>
+
+    <button class="tab" type="button" role="tab" id="tab-fig6" aria-controls="fig6" aria-selected="false" tabindex="-1">
+      <span class="tab__name">스케일</span>
+    </button>
     <button class="tab" type="button" role="tab" id="tab-fig8" aria-controls="fig8" aria-selected="false" tabindex="-1">
-      <span class="tab__name">미리 준비된 제안</span>
+      <span class="tab__name">준비된 제안</span>
+    </button>
+    <button class="tab" type="button" role="tab" id="tab-fig9" aria-controls="fig9" aria-selected="false" tabindex="-1">
+      <span class="tab__name">확신의 농도</span>
+    </button>
+    <button class="tab" type="button" role="tab" id="tab-fig10" aria-controls="fig10" aria-selected="false" tabindex="-1">
+      <span class="tab__name">되돌리기</span>
     </button>
   </div>
 </div>
 
 <main class="wrap">
 
-  <!-- 표본 8판이 같은 자리를 나눠 쓴다. 높이는 JS가 가장 높은 판에 맞춘다 -->
+  <!-- 표본 10판이 같은 자리를 나눠 쓴다. 높이는 JS가 휠 판을 기준으로 맞춘다 -->
   <div class="panels" id="panels">
 
   <!-- ═══════════ 00 · 시작 ═══════════ -->
   <section class="plate" id="start" role="tabpanel" aria-labelledby="tab-start">
     <div class="plate__bar">
       <span class="mono plate__fig">00</span>
-      <span class="mono plate__spec">표본 <b>8종</b></span>
-      <span class="mono plate__spec">과거 <b>5</b> · 미래 <b>3</b></span>
+      <span class="mono plate__spec">표본 <b>10종</b></span>
+      <span class="mono plate__spec">과거 <b>6</b> · 미래 <b>4</b></span>
       <span class="plate__bar-spacer"></span>
-      <span class="mono plate__spec">탭을 눌러 <b>만져보세요</b></span>
     </div>
     <div class="plate__body plate__body--start">
       <div class="quote">
-        <blockquote class="quote__text">디자인은 겉모습이나 느낌이 아닙니다. <em>디자인은 그것이 어떻게 작동하는가입니다.</em></blockquote>
         <p class="quote__src">
-          <span class="quote__orig" lang="en">“Design is not just what it looks like and feels like. Design is how it works.”</span>
-          <span class="mono quote__by">스티브 잡스 &nbsp;·&nbsp; 뉴욕타임스 매거진 &nbsp;·&nbsp; 2003</span>
+          <span class="quote__orig">디자인은 겉모습이나 느낌이 아닙니다.<br><em>디자인은 그것이 어떻게 작동하는가입니다.</em></span>
+          <span class="mono quote__by">스티브 잡스 &nbsp;/&nbsp; 뉴욕타임스 매거진 2003</span>
         </p>
       </div>
 
       <div class="intro">
         <nav class="toc" aria-label="표본 목록">
           <div class="toc__group">
-            <h3 class="mono toc__head">과거 · 그가 실제로 만든 것</h3>
+            <h3 class="mono toc__head">그가 실제로 만든 것</h3>
             <ul class="toc__list">
               <li><button type="button" class="toc__item" data-goto="fig1"><span class="mono">01</span>휠</button></li>
-              <li><button type="button" class="toc__item" data-goto="fig2"><span class="mono">02</span>고무줄</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig2"><span class="mono">02</span>바운스</button></li>
               <li><button type="button" class="toc__item" data-goto="fig3"><span class="mono">03</span>끌어다 놓기</button></li>
               <li><button type="button" class="toc__item" data-goto="fig4"><span class="mono">04</span>밀어서 열기</button></li>
               <li><button type="button" class="toc__item" data-goto="fig5"><span class="mono">05</span>바뀌는 자판</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig7"><span class="mono">06</span>명사 후 동사</button></li>
             </ul>
           </div>
           <div class="toc__group">
-            <h3 class="mono toc__head">미래 · 그가 만들었을 것</h3>
+            <h3 class="mono toc__head">그가 만들었을 것</h3>
             <ul class="toc__list">
-              <li><button type="button" class="toc__item" data-goto="fig6"><span class="mono">06</span>스케일 손잡이</button></li>
-              <li><button type="button" class="toc__item" data-goto="fig7"><span class="mono">07</span>명사 후 동사</button></li>
-              <li><button type="button" class="toc__item" data-goto="fig8"><span class="mono">08</span>미리 준비된 제안</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig6"><span class="mono">07</span>스케일</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig8"><span class="mono">08</span>준비된 제안</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig9"><span class="mono">09</span>확신의 농도</button></li>
+              <li><button type="button" class="toc__item" data-goto="fig10"><span class="mono">10</span>되돌리기</button></li>
             </ul>
           </div>
         </nav>
@@ -169,7 +176,7 @@
     </div>
   </section>
 
-  <!-- FIG.02 고무줄 — 데이터·기능이 같고 손 뗀 뒤의 물리만 다른 두 스크롤러. -->
+  <!-- FIG.02 바운스 — 데이터·기능이 같고 손 뗀 뒤의 물리만 다른 두 스크롤러. -->
   <section class="plate" id="fig2" role="tabpanel" aria-labelledby="tab-fig2" hidden>
     <div class="plate__bar">
       <span class="mono plate__fig">FIG. 02</span>
@@ -205,12 +212,12 @@
       </div>
 
       <div class="plate__note">
-        <h2 class="plate__title">고무줄</h2>
-        <span class="mono plate__kr">기능표에는 적히지 않는 것</span>
+        <h2 class="plate__title">바운스</h2>
+        <span class="mono plate__kr">손을 뗀 뒤에 벌어지는 일</span>
         <p>
           두 목록은 <strong>기능이 완전히 같습니다.</strong> 차이는 손을 뗀 뒤에 벌어집니다.
           끝에서 늘어났다 돌아오는 0.3초는 아무 정보도 주지 않고, 다만 "여기가 끝"이라는 사실을 손가락에 알려줍니다.
-          잡스가 특허까지 낸 게 이 고무줄이었습니다.
+          애플이 특허(US 7,469,381)까지 낸 게 이 바운스였습니다.
         </p>
         <div class="rule"></div>
         <div class="verdict">
@@ -228,7 +235,7 @@
       <span class="mono plate__spec">입력 <b>집어서 놓기</b></span>
       <span class="mono plate__spec">원형 <b>Macintosh 1984</b></span>
       <span class="plate__bar-spacer"></span>
-      <button class="chip mono" id="deskReset">책상 정리</button>
+      <button class="chip mono" id="deskReset">초기화</button>
     </div>
     <div class="plate__body">
       <div class="plate__stage">
@@ -236,12 +243,26 @@
           <div class="desk__loose" id="deskLoose"></div>
           <div class="desk__targets">
             <div class="drop" id="dropFolder">
-              <span class="drop__glyph">▤</span>
+              <span class="drop__glyph">
+                <svg viewBox="0 0 24 20" aria-hidden="true">
+                  <path d="M1.4 4.6A1.6 1.6 0 0 1 3 3h5.7l2 2.6h10.3A1.6 1.6 0 0 1 22.6 7.2v10.2A1.6 1.6 0 0 1 21 19H3a1.6 1.6 0 0 1-1.6-1.6z"
+                        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+              </span>
               <span class="drop__name">프로젝트</span>
               <span class="mono drop__num" id="foldNum">0</span>
             </div>
             <div class="drop drop--bin" id="dropBin">
-              <span class="drop__glyph">⊗</span>
+              <span class="drop__glyph">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3.6 6.4h16.8M9.6 6.4V4.3c0-.7.56-1.25 1.25-1.25h2.3c.7 0 1.25.56 1.25 1.25v2.1"
+                        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M5.8 6.4l.85 12.8c.05.8.72 1.43 1.53 1.43h7.64c.81 0 1.48-.62 1.53-1.43l.85-12.8"
+                        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M10.1 10.4v6.8M13.9 10.4v6.8"
+                        fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+              </span>
               <span class="drop__name">휴지통</span>
               <span class="mono drop__num" id="binNum">0</span>
             </div>
@@ -293,7 +314,7 @@
               <div class="lock__fill" id="lockFill"></div>
               <div class="lock__hint" id="lockHint">밀어서 잠금 해제</div>
               <div class="lock__knob" id="lockKnob" role="slider" tabindex="0"
-                   aria-label="밀어서 잠금 해제" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">&#9654;</div>
+                   aria-label="밀어서 잠금 해제" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
             </div>
           </div>
           <div class="lockstate" id="lockState"></div>
@@ -377,10 +398,10 @@
 
   <!-- ═══════════ 미래 · 그가 만들었을 것 ═══════════ -->
 
-  <!-- FIG.06 스케일 손잡이 — 프롬프트 입력 0자. 조절기가 결과물에 붙어 있다. -->
+  <!-- FIG.06 스케일 — 프롬프트 입력 0자. 조절기가 결과물에 붙어 있다. -->
   <section class="plate" id="fig6" role="tabpanel" aria-labelledby="tab-fig6" hidden>
     <div class="plate__bar">
-      <span class="mono plate__fig">FIG. 06</span>
+      <span class="mono plate__fig">FIG. 07</span>
       <span class="mono plate__spec">입력 <b>수직 드래그</b></span>
       <span class="mono plate__spec plate__spec--future">구분 <b>아직 없음</b></span>
       <span class="plate__bar-spacer"></span>
@@ -392,7 +413,13 @@
           <div class="paper" id="paper">
             <p class="paper__text" id="paperText"></p>
             <div class="handle" id="handle" role="slider" tabindex="0"
-                 aria-label="설명 상세도" aria-valuemin="1" aria-valuenow="2" aria-valuemax="5"><i></i></div>
+                 aria-label="설명 상세도" aria-valuemin="1" aria-valuenow="2" aria-valuemax="5">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 4.6v14.8M8.3 8.3L12 4.6l3.7 3.7M8.3 15.7L12 19.4l3.7-3.7"
+                      fill="none" stroke="currentColor" stroke-width="1.7"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
           </div>
           <div class="ladder" id="ladder"></div>
           <div class="deadbox">
@@ -407,7 +434,7 @@
       </div>
 
       <div class="plate__note">
-        <h2 class="plate__title">스케일 손잡이</h2>
+        <h2 class="plate__title">스케일</h2>
         <span class="mono plate__kr">프롬프트 창은 명령줄로의 회귀다</span>
         <p>
           빈 입력창은 <strong>"무엇을 쳐야 하는지 먼저 배우라"</strong>고 요구합니다.
@@ -426,9 +453,9 @@
   <!-- FIG.07 명사 후 동사 — 명사→동사 순서. 대상 위에만 가능한 동사가 나타난다. -->
   <section class="plate" id="fig7" role="tabpanel" aria-labelledby="tab-fig7" hidden>
     <div class="plate__bar">
-      <span class="mono plate__fig">FIG. 07</span>
+      <span class="mono plate__fig">FIG. 06</span>
       <span class="mono plate__spec">입력 <b>선택 → 동사</b></span>
-      <span class="mono plate__spec plate__spec--future">뿌리 <b>Macintosh 1984</b></span>
+      <span class="mono plate__spec">원형 <b>Xerox Star 1981</b></span>
       <span class="plate__bar-spacer"></span>
       <span class="mono plate__spec">사진이나 문단을 <b>눌러보세요</b></span>
     </div>
@@ -487,27 +514,29 @@
         <h2 class="plate__title">명사 후 동사</h2>
         <span class="mono plate__kr">고르기 전엔 아무 동사도 없다</span>
         <p>
-          매킨토시의 핵심은 마우스가 아니라 <strong>명사–동사 순서</strong>였습니다. 대상을 먼저 고르면
-          그 대상이 할 수 있는 일만 나타납니다. 외울 명령어도, 불가능한 명령을 내릴 방법도 없습니다.
-          챗봇은 정반대로, 무엇을 시킬 수 있는지 화면 어디에도 적혀 있지 않습니다.
+          동사를 먼저 고르게 하면 사용자는 그 동사가 무엇에 쓰이는지 외워야 합니다.
+          제록스 PARC의 래리 테슬러는 순서를 뒤집자고 했습니다 — <strong>대상을 먼저 고르면
+          그 대상이 할 수 있는 일만 나타난다.</strong> 1981년 제록스 스타가 이를 제품으로 구현했고,
+          테슬러는 이듬해 애플로 옮겨 같은 원칙을 리사와 매킨토시에 심었습니다.
+          외울 명령어도, 불가능한 명령을 내릴 방법도 없어집니다.
         </p>
         <div class="rule"></div>
         <div class="verdict">
-          <b>그가 만들었다면</b>
-          AI의 능력을 자랑하는 자리는 안내 문구가 아니라, 사용자가 방금 선택한 그 대상 위입니다.
+          <b>오늘로 옮기면</b>
+          챗봇은 이 순서를 되돌렸습니다. 무엇을 시킬 수 있는지 화면 어디에도 적혀 있지 않습니다.
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FIG.08 미리 준비된 제안 — 묻기 전에 이미 되어 있다. 제안 문구는 전부 사전 작성. -->
+  <!-- FIG.08 준비된 제안 — 묻기 전에 이미 되어 있다. 제안 문구는 전부 사전 작성. -->
   <section class="plate" id="fig8" role="tabpanel" aria-labelledby="tab-fig8" hidden>
     <div class="plate__bar">
       <span class="mono plate__fig">FIG. 08</span>
       <span class="mono plate__spec">입력 <b>수락 / 버림</b></span>
       <span class="mono plate__spec plate__spec--future">구분 <b>아직 없음</b></span>
       <span class="plate__bar-spacer"></span>
-      <button class="chip mono" id="ghostReset">제안 되돌리기</button>
+      <button class="chip mono" id="ghostReset">초기화</button>
     </div>
     <div class="plate__body">
       <div class="plate__stage">
@@ -526,7 +555,7 @@
       </div>
 
       <div class="plate__note">
-        <h2 class="plate__title">미리 준비된 제안</h2>
+        <h2 class="plate__title">준비된 제안</h2>
         <span class="mono plate__kr">가장 빠른 답변은 답변하지 않는 것</span>
         <p>
           요청도, 대기도 없습니다. 문서를 여는 순간 <strong>고칠 곳이 이미 표시돼 있습니다.</strong>
@@ -542,11 +571,115 @@
     </div>
   </section>
 
+  <!-- FIG.09 확신의 농도 — 모르는 부분이 눈에 먼저 보이게. 등급은 사전에 매겨둔 것. -->
+  <section class="plate" id="fig9" role="tabpanel" aria-labelledby="tab-fig9" hidden>
+    <div class="plate__bar">
+      <span class="mono plate__fig">FIG. 09</span>
+      <span class="mono plate__spec">입력 <b>표시 끄고 켜기</b></span>
+      <span class="mono plate__spec plate__spec--future">구분 <b>아직 없음</b></span>
+      <span class="plate__bar-spacer"></span>
+      <button class="chip mono" id="confReset">초기화</button>
+    </div>
+    <div class="plate__body">
+      <div class="plate__stage">
+        <div class="answer">
+          <div class="chatline chatline--me">매킨토시는 얼마나 팔렸나?</div>
+          <div class="chatline chatline--ai">
+            <p class="answer__body" id="answerBody"></p>
+          </div>
+        </div>
+        <div class="answer__why" id="answerWhy"></div>
+        <div class="readout">
+          <span>확인이 필요한 곳 <b id="confLow">0</b>군데</span>
+        </div>
+      </div>
+
+      <div class="plate__note">
+        <h2 class="plate__title">확신의 농도</h2>
+        <span class="mono plate__kr">모르는 부분이 먼저 눈에 띄어야 한다</span>
+        <p>
+          <strong>지금의 AI는</strong> 기록에서 온 날짜도, 자료마다 갈리는 어림값도,
+          출처 없이 떠도는 일화도 전부 같은 굵기의 단정적인 문장으로 보여줍니다.
+          여기서는 <strong>글자의 농도가 곧 자료의 층위</strong>입니다.
+          흐린 곳을 누르면 1차 기록인지, 갈리는 2차 자료인지, 구전인지가 나옵니다.
+        </p>
+        <div class="rule"></div>
+        <div class="verdict">
+          <b>그가 만들었다면</b>
+          확신은 숫자가 아니라 <b>농도</b>로 보여줬을 겁니다. 퍼센트는 읽어야 알지만, 농도는 보면 압니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FIG.10 되돌리기 — 왼쪽은 지나간 버전이 남고, 오른쪽은 사라진다. 문장은 전부 사전 작성. -->
+  <section class="plate" id="fig10" role="tabpanel" aria-labelledby="tab-fig10" hidden>
+    <div class="plate__bar">
+      <span class="mono plate__fig">FIG. 10</span>
+      <span class="mono plate__spec">비교 <b>이력 vs 재생성</b></span>
+      <span class="mono plate__spec plate__spec--future">구분 <b>아직 없음</b></span>
+      <span class="plate__bar-spacer"></span>
+      <button class="chip mono" id="verReset">초기화</button>
+    </div>
+    <div class="plate__body">
+      <div class="plate__stage">
+        <div class="abpair">
+          <!-- A: 지금의 방식 -->
+          <div class="ver ver--bad">
+            <div class="mono ver__head"><span>A</span><b>다시 생성</b></div>
+            <p class="ver__text" id="verTextA"></p>
+            <div class="vstrip" id="vstripA"></div>
+            <div class="ver__foot">
+              <button class="chip mono" id="verAgain">다시 생성</button>
+              <span class="mono ver__lost">잃어버린 버전 <b id="verLost">0</b>개</span>
+            </div>
+          </div>
+
+          <!-- B: 되돌릴 수 있는 방식 -->
+          <div class="ver ver--good">
+            <div class="mono ver__head"><span>B</span><b>이력이 남음</b></div>
+            <p class="ver__text" id="verTextB"></p>
+            <div class="vstrip" id="vstripB"></div>
+            <div class="ver__foot">
+              <span class="mono ver__lost">되돌아갈 수 있는 버전 <b id="verKept">5</b>개</span>
+            </div>
+          </div>
+        </div>
+        <div class="readout">
+          <span>A 현재 <b id="verPosA">1</b>/5</span>
+          <span>B 현재 <b id="verPosB">1</b>/5</span>
+        </div>
+      </div>
+
+      <div class="plate__note">
+        <h2 class="plate__title">되돌리기</h2>
+        <span class="mono plate__kr">지나간 버전이 물건처럼 남는다</span>
+        <p>
+          지금의 AI 도구는 <strong>다시 시키면 아까 것이 사라집니다.</strong> 세 번째가 제일 좋았는데
+          네 번을 눌러버렸다면 되찾을 방법이 없습니다. 확률적으로 답이 달라지니 같은 요청을 다시 해도
+          같은 문장이 나오지 않습니다. 문서 편집기가 사십 년 전에 해결한 문제입니다.
+        </p>
+        <div class="rule"></div>
+        <div class="verdict">
+          <b>그가 만들었다면</b>
+          확률적인 기계 위에 <b>결정적인 껍데기</b>를 씌웠을 겁니다. 같은 자리로 돌아가면 언제나 같은 결과여야 합니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
   </div><!-- /.panels -->
 
 </main>
 
-<audio id="track" src="music-sample.mp3" preload="none"></audio>
+<footer class="signature">
+  <div class="wrap">
+    <span class="mono">design by kisung.
+      <a class="signature__link" href="https://www.corca.ai/ax" target="_blank" rel="noopener noreferrer">Corca AX</a></span>
+  </div>
+</footer>
+
+<audio id="track" src="ziggy-walk-the-walk.mp3" preload="none"></audio>
 <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 /* ============================================================
-   steve — 잡스가 시도했을 인터페이스 표본실
-   데모 5종. 외부 요청 없음. 가짜 AI 응답 없음.
+   steve — 잡스가 만들었던, 그리고 만들었을 인터페이스 표본실
+   표본 10종. 외부 요청 없음. 가짜 AI 응답 없음.
    ============================================================ */
 (function () {
   "use strict";
@@ -49,6 +49,43 @@
     osc.stop(c.currentTime + 0.03);
   }
 
+  /* 벽에 부딪히는 소리. 딸깍음과 달리 낮고 둔탁하게 떨어진다.
+     A판이 경계에서 즉시 멈추는 걸 귀로도 알 수 있도록. */
+  function thud() {
+    if (!audio.on) return;
+    var c = ensureCtx();
+    if (!c) return;
+    var t = c.currentTime;
+
+    // 몸통 — 노트북 스피커가 못 내는 저역(150Hz 아래)으로 떨어지지 않게 잡는다
+    var body = c.createOscillator();
+    var bodyGain = c.createGain();
+    var lp = c.createBiquadFilter();
+    body.type = "triangle";
+    body.frequency.setValueAtTime(330, t);
+    body.frequency.exponentialRampToValueAtTime(124, t + 0.08);
+    lp.type = "lowpass";
+    lp.frequency.value = 1100;
+    bodyGain.gain.setValueAtTime(0.0001, t);
+    bodyGain.gain.exponentialRampToValueAtTime(0.30, t + 0.004);
+    bodyGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+    body.connect(lp); lp.connect(bodyGain); bodyGain.connect(c.destination);
+    body.start(t);
+    body.stop(t + 0.16);
+
+    // 어택 — 작은 스피커에서도 '톡' 하고 걸리는 짧은 고역
+    var tap = c.createOscillator();
+    var tapGain = c.createGain();
+    tap.type = "square";
+    tap.frequency.setValueAtTime(880, t);
+    tapGain.gain.setValueAtTime(0.0001, t);
+    tapGain.gain.exponentialRampToValueAtTime(0.09, t + 0.002);
+    tapGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+    tap.connect(tapGain); tapGain.connect(c.destination);
+    tap.start(t);
+    tap.stop(t + 0.04);
+  }
+
   if (sndBtn) {
     sndBtn.addEventListener("click", function () {
       setSound(!audio.on);
@@ -59,7 +96,7 @@
   }
 
   /* ==========================================================
-     음악 — music-sample.mp3
+     음악 — ziggy-walk-the-walk.mp3
      휠 가운데 버튼이 이 파일을 재생한다.
      ========================================================== */
   var MUSIC = (function () {
@@ -296,7 +333,7 @@
     } else {
       line.appendChild(document.createTextNode("재생 중 "));
       var b = document.createElement("b");
-      b.textContent = "music-sample.mp3";
+      b.textContent = "Ziggy — Walk the Walk";
       line.appendChild(b);
     }
     nowPlaying.appendChild(line);
@@ -326,7 +363,7 @@
   paintNowPlaying();
 
   /* ==========================================================
-     FIG.02 — 관성 & 고무줄
+     FIG.02 — 관성 & 바운스
      두 스크롤러의 데이터와 기능은 동일. 손을 뗀 뒤의 물리만 다르다.
      ========================================================== */
   var SHIPPED = [
@@ -356,17 +393,33 @@
     [2011, "iCloud", "마지막 기조연설"]
   ];
 
+  // 연도는 왼쪽에 고정하고, 이름과 설명은 오른쪽에 두 줄로 쌓는다.
+  // 셋을 한 줄에 나란히 두면 좁은 판에서 연도까지 쪼개진다.
   function fillItems(el) {
     SHIPPED.forEach(function (s) {
-      var d = document.createElement("div");
-      d.className = "item";
-      ["item__y", "item__n", "item__d"].forEach(function (cls, i) {
-        var span = document.createElement("span");
-        span.className = cls;
-        span.textContent = s[i];
-        d.appendChild(span);
-      });
-      el.appendChild(d);
+      var row = document.createElement("div");
+      row.className = "item";
+
+      var year = document.createElement("span");
+      year.className = "item__y";
+      year.textContent = s[0];
+
+      var txt = document.createElement("div");
+      txt.className = "item__txt";
+
+      var name = document.createElement("span");
+      name.className = "item__n";
+      name.textContent = s[1];
+
+      var desc = document.createElement("span");
+      desc.className = "item__d";
+      desc.textContent = s[2];
+
+      txt.appendChild(name);
+      txt.appendChild(desc);
+      row.appendChild(year);
+      row.appendChild(txt);
+      el.appendChild(row);
     });
   }
 
@@ -375,7 +428,8 @@
     fillItems(inner);
 
     var edges = host.querySelectorAll(".scroller__edge");
-    var y = 0, v = 0, down = false, lastY = 0, lastT = 0, raf = null;
+    var y = 0, v = 0, down = false, lastY = 0, lastT = 0, raf = null, springTimer = null;
+    var atEdge = false;             // 벽에 붙어 있는 중인지 — 충돌음을 한 번만 내려고
 
     function minY() { return Math.min(0, host.clientHeight - inner.scrollHeight); }
 
@@ -390,10 +444,18 @@
       }
     }
 
+    /* 이 함수는 A판(관성 없음)에서만 호출된다.
+       벽에 처음 닿는 순간 한 번만 소리를 낸다 — 붙어 있는 동안 계속 울리지 않도록. */
     function clampHard() {
       var min = minY();
-      if (y > 0)   { y = 0;   v = 0; }
-      if (y < min) { y = min; v = 0; }
+      var hit = false;
+      if (y > 0)   { y = 0;   hit = true; }
+      if (y < min) { y = min; hit = true; }
+      if (hit) {
+        if (!atEdge && Math.abs(v) > 0.8) thud();   // 살짝 스친 건 소리 내지 않는다
+        v = 0;
+      }
+      atEdge = hit;
     }
 
     function tick() {
@@ -430,6 +492,7 @@
       down = true;
       host.setPointerCapture(ev.pointerId);
       if (raf) { cancelAnimationFrame(raf); raf = null; }
+      if (springTimer) { window.clearTimeout(springTimer); springTimer = null; }
       v = 0;
       lastY = ev.clientY;
       lastT = performance.now();
@@ -446,10 +509,13 @@
 
       var min = minY();
       if (opts.physics && (y > 0 || y < min)) dy *= 0.38;   // 경계 밖 저항
+
+      // 속도를 먼저 갱신해야 clampHard()가 이번 프레임의 충돌 세기를 본다.
+      // 뒤에 두면 벽에 닿는 순간 늘 직전 값(첫 프레임이면 0)을 읽어 소리가 안 난다.
+      v = v * 0.4 + (dy / dt * 16) * 0.6;
+
       y += dy;
       if (!opts.physics) clampHard();
-
-      v = v * 0.4 + (dy / dt * 16) * 0.6;
       paint();
     });
 
@@ -468,11 +534,35 @@
     host.addEventListener("pointerup", release);
     host.addEventListener("pointercancel", release);
 
+    /* 트랙패드·마우스 휠. 드래그와 같은 규칙을 적용해야 A/B 대조가 성립한다.
+       예전에는 여기서 무조건 clampHard()를 불러 B판의 고무줄이 죽었다. */
     host.addEventListener("wheel", function (ev) {
       if (raf) { cancelAnimationFrame(raf); raf = null; }
-      y -= ev.deltaY;
-      clampHard();
-      paint();
+      if (springTimer) { window.clearTimeout(springTimer); springTimer = null; }
+
+      // 파이어폭스는 줄 단위(1), 일부 환경은 페이지 단위(2)로 준다
+      var unit = ev.deltaMode === 1 ? 16 : (ev.deltaMode === 2 ? host.clientHeight : 1);
+      var dy = -ev.deltaY * unit;
+      var min = minY();
+
+      if (opts.physics) {
+        if (y > 0 || y < min) dy *= 0.38;        // 경계 밖 저항 — 드래그와 동일
+        y += dy;
+        v = 0;
+        paint();
+        // 연속 입력이 끊긴 뒤에 스프링으로 되돌린다
+        if (y > 0 || y < min) {
+          springTimer = window.setTimeout(function () {
+            springTimer = null;
+            if (!raf) raf = requestAnimationFrame(tick);
+          }, 90);
+        }
+      } else {
+        y += dy;
+        v = dy / 8;                               // 충돌 세기를 잡아야 벽 소리가 난다
+        clampHard();                              // 경계에서 즉시 사망
+        paint();
+      }
       ev.preventDefault();
     }, { passive: false });
 
@@ -492,7 +582,7 @@
   });
 
   /* ==========================================================
-     FIG.06 — 스케일 손잡이
+     FIG.06 — 스케일
      상세도 5단계. 각 단계의 본문과 "안 쳐도 되는 문장"이 짝을 이룬다.
      ========================================================== */
   var LEVELS = [
@@ -625,6 +715,7 @@
     photo.classList.toggle("is-gray",   state.gray);
     photo.classList.toggle("is-square", state.square);
     photo.classList.toggle("is-nobg",   state.nobg);
+    // 평소엔 원본 그대로(meet), '정사각'일 때만 잘라낸다(slice)
     photoSvg.setAttribute("preserveAspectRatio", state.square ? "xMidYMid slice" : "xMidYMid meet");
 
     para.innerHTML = state.short ? PARA_SHORT : PARA_LONG;
@@ -647,17 +738,22 @@
     mirror.textContent = noun + (parts.length ? parts.join(" ") + " " : "") + last;
   }
 
+  var OBJS = [objPhoto, objPara];
+
   function select(obj) {
-    [objPhoto, objPara].forEach(function (o) {
+    var was = document.querySelector(".obj.is-sel");
+    OBJS.forEach(function (o) {
       var on = (o === obj);
       o.classList.toggle("is-sel", on);
       o.setAttribute("aria-pressed", String(on));
       o.querySelectorAll(".verb").forEach(function (b) { b.tabIndex = on ? 0 : -1; });
     });
+    // 대상을 집을 때와 놓을 때의 소리를 다르게 — 선택도 조작이다
+    if (was !== obj) click(obj ? 1650 : 1000);
     paintDoc();
   }
 
-  [objPhoto, objPara].forEach(function (o) {
+  OBJS.forEach(function (o) {
     o.addEventListener("click", function (ev) {
       if (ev.target.closest(".verb")) return;
       select(o.classList.contains("is-sel") ? null : o);
@@ -703,11 +799,23 @@
   var cntMoved  = document.getElementById("cntMoved");
   var deskReset = document.getElementById("deskReset");
 
+  // 아이콘은 선 하나짜리 도형으로. currentColor라 테마·상태를 그대로 따라간다
+  var GLYPHS = {
+    doc: '<path d="M6 2.6h7.4L18 7.2v14.2H6z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>' +
+         '<path d="M13.2 2.8v4.4h4.4M8.8 12h6.4M8.8 15.4h6.4M8.8 18.2h4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>',
+    img: '<rect x="3.4" y="5" width="17.2" height="14" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
+         '<circle cx="9" cy="10" r="1.6" fill="none" stroke="currentColor" stroke-width="1.3"/>' +
+         '<path d="M4.2 16.4l4.4-4 3.2 2.9 3.4-3.6 4.4 4.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>',
+    aud: '<path d="M9.4 17.6V5.2l8.4-1.8v12.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>' +
+         '<ellipse cx="7.2" cy="17.8" rx="2.3" ry="1.9" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
+         '<ellipse cx="15.6" cy="15.8" rx="2.3" ry="1.9" fill="none" stroke="currentColor" stroke-width="1.4"/>'
+  };
+
   var DESK_FILES = [
-    { name: "계획서.txt", glyph: "▤" },
-    { name: "사진.png",   glyph: "▩" },
-    { name: "노래.mp3",   glyph: "♪" },
-    { name: "메모.md",    glyph: "▤" }
+    { name: "계획서.txt", kind: "doc" },
+    { name: "사진.png",   kind: "img" },
+    { name: "노래.mp3",   kind: "aud" },
+    { name: "메모.md",    kind: "doc" }
   ];
 
   var inFolder = 0, inBin = 0, moved = 0, dragIcon = null;
@@ -737,7 +845,7 @@
 
     var g = document.createElement("span");
     g.className = "icon__glyph";
-    g.textContent = file.glyph;
+    g.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + GLYPHS[file.kind] + "</svg>";
     var n = document.createElement("span");
     n.className = "icon__name";
     n.textContent = file.name;
@@ -815,6 +923,14 @@
   var lockPct   = document.getElementById("lockPct");
   var lockBack  = document.getElementById("lockBack");
 
+  // 손잡이 표시 — 잠겼을 땐 밀 방향을 가리키는 화살표, 열리면 체크
+  var LOCK_ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+    '<path d="M4.6 12h13.6M12.4 5.9L18.6 12l-6.2 6.1" fill="none" stroke="currentColor" ' +
+    'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var LOCK_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+    '<path d="M5.2 12.6l4.6 4.7L18.8 7.4" fill="none" stroke="currentColor" ' +
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
   var LOCK_TH = 0.92;
   var lockX = 0, lockDrag = null, lockOpen = false, lockBacks = 0, lockRaf = null;
 
@@ -864,7 +980,7 @@
   function lockSetOpen(on) {
     lockOpen = on;
     lock.classList.toggle("is-open", on);
-    lockKnob.textContent = on ? "✓" : "▶";
+    lockKnob.innerHTML = on ? LOCK_CHECK : LOCK_ARROW;
     lockX = on ? lockSpan() : 0;
     paintLock();
   }
@@ -925,11 +1041,11 @@
     }
   });
 
+  lockSetOpen(false);             // 손잡이에 화살표를 얹고 위치를 잡는다
   lockSay("");
-  paintLock();
 
   /* ==========================================================
-     FIG.08 — 미리 준비된 제안
+     FIG.08 — 준비된 제안
      묻기 전에 이미 되어 있다. 사용자는 요청하지 않고 고르기만 한다.
      제안 문구는 전부 사전에 작성된 것 — 생성 호출은 없다.
      ========================================================== */
@@ -975,6 +1091,10 @@
       was.className = "ghost__was";
       was.textContent = seg.was;
 
+      // 받아들이기와 버리기는 하나의 컨트롤을 둘로 나눈 것이다
+      var pair = document.createElement("span");
+      pair.className = "ghost__pair";
+
       var now = document.createElement("button");
       now.type = "button";
       now.className = "ghost__now";
@@ -989,7 +1109,9 @@
       var no = document.createElement("button");
       no.type = "button";
       no.className = "ghost__no";
-      no.textContent = "✕";
+      no.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+        '<path d="M7.4 7.4l9.2 9.2M16.6 7.4l-9.2 9.2" fill="none" stroke="currentColor" ' +
+        'stroke-width="2.9" stroke-linecap="round"/></svg>';
       no.setAttribute("aria-label", "이 제안 버리기");
       no.addEventListener("click", function () {
         seg.done = true; seg.taken = false;
@@ -997,9 +1119,10 @@
         ghostPaint();
       });
 
+      pair.appendChild(now);
+      pair.appendChild(no);
       wrap.appendChild(was);
-      wrap.appendChild(now);
-      wrap.appendChild(no);
+      wrap.appendChild(pair);
       ghostDoc.appendChild(wrap);
     });
 
@@ -1158,27 +1281,178 @@
   var tabsTop = document.getElementById("tabsTop");
   var panelBox = document.getElementById("panels");
 
-  /* 판마다 내용 분량이 달라 높이가 제각각이다.
-     가장 높은 판을 실측해 모든 판을 그 높이로 맞춘다 — 탭을 눌러도 상자가 안 덜컹거리도록.
+  /* 표본판끼리만 높이를 맞춘다 — 탭을 눌러도 상자가 안 덜컹거리도록.
+     시작 판은 표본이 아니라 앞표지라 여기서 뺀다. 넣어두면 그 판의 크기가
+     나머지 여덟 판의 높이까지 끌고 다닌다.
      레이아웃만 읽고 페인트 전에 원상복구하므로 깜빡임은 없다. */
+  /* ==========================================================
+     FIG.09 — 확신의 농도
+     답변을 조각으로 나누고 조각마다 확신 등급을 매겨 둔다.
+     등급과 근거는 전부 사전에 작성한 것 — 모델을 부르지 않는다.
+     ========================================================== */
+  var answerBody = document.getElementById("answerBody");
+  var answerWhy  = document.getElementById("answerWhy");
+  var confLow    = document.getElementById("confLow");
+
+  /* 농도는 "출처가 있나"가 아니라 "출처가 어떤 종류인가"로 매긴다.
+     src = 자료의 층위와 출처 간 일치도. */
+  var ANSWER = [
+    { t: "매킨토시는 1984년 1월 24일에 발표됐고, 가격은 2,495달러였습니다. ", g: "sure" },
+    { t: "첫 100일 동안 약 7만 대가 팔렸으며", g: "soft",
+      src: "발표 수치 · 독립 검증 없음",
+      why: "당시 애플이 스스로 발표한 숫자입니다. 판매사가 낸 값이라 독립적으로 확인된 바 없고, '약'이라는 어림이 붙어 있습니다." },
+    { t: ", 그해 말에는 판매가 크게 꺾였습니다. ", g: "sure" },
+    { t: "잡스는 이 숫자를 두고 팀을 몰아붙였다고 전해집니다", g: "weak",
+      src: "구전 · 1차 기록 없음",
+      why: "전기와 회고에 나오는 일화입니다. 화자마다 내용이 다르고 대조할 원문이 없습니다." },
+    { t: ".", g: "sure" }
+  ];
+
+  function answerSay(seg) {
+    answerWhy.textContent = "";
+    var tag = document.createElement("b");
+    tag.textContent = seg ? seg.src : "안내";      // 자료의 층위를 라벨로 앞세운다
+    answerWhy.appendChild(tag);
+    answerWhy.appendChild(document.createTextNode(
+      seg ? seg.why : "흐리게 표시된 곳을 누르면 어떤 자료에 근거했는지 나옵니다."));
+  }
+
+  function answerPaint() {
+    answerBody.textContent = "";
+    var low = 0;
+
+    ANSWER.forEach(function (seg) {
+      var el = document.createElement("span");
+      el.className = "grade grade--" + seg.g;
+      el.textContent = seg.t;
+
+      if (seg.why) {
+        low++;
+        el.tabIndex = 0;
+        el.setAttribute("role", "button");
+        el.setAttribute("aria-label", "확신이 낮은 대목 — 근거 보기");
+        var open = function () {
+          answerBody.querySelectorAll(".grade").forEach(function (x) { x.classList.remove("is-open"); });
+          el.classList.add("is-open");
+          answerSay(seg);
+          click(1500);
+        };
+        el.addEventListener("click", open);
+        el.addEventListener("keydown", function (ev) {
+          if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); open(); }
+        });
+      }
+      answerBody.appendChild(el);
+    });
+
+    confLow.textContent = String(low);
+    answerSay(null);
+  }
+
+  document.getElementById("confReset").addEventListener("click", function () {
+    click(1400);
+    answerPaint();               // 열린 대목을 닫고 안내 문구로 되돌린다
+  });
+
+  answerPaint();
+
+  /* ==========================================================
+     FIG.10 — 되돌리기
+     같은 다섯 버전을 두 방식으로 다룬다.
+     A: 다시 생성 — 앞으로만 간다. 지나간 자리는 잠긴다.
+     B: 이력 — 어느 자리로든 돌아갈 수 있고, 같은 자리는 늘 같은 문장이다.
+     문장은 전부 사전에 작성한 것 — 모델을 부르지 않는다.
+     ========================================================== */
+  var VERSIONS = [
+    "매킨토시는 마우스로 쓰는 컴퓨터입니다.",
+    "매킨토시는 명령어 대신 마우스로 쓰는 컴퓨터입니다.",
+    "명령어를 외우는 대신 화면 속 물건을 직접 집어 쓰는 컴퓨터입니다.",
+    "외울 것이 없는 컴퓨터입니다. 화면에 보이는 것을 집어서 옮기면 그대로 됩니다.",
+    "외울 것이 없습니다. 보이는 것을 집어 옮기면, 그대로 됩니다."
+  ];
+
+  var verTextA = document.getElementById("verTextA");
+  var verTextB = document.getElementById("verTextB");
+  var vstripA  = document.getElementById("vstripA");
+  var vstripB  = document.getElementById("vstripB");
+  var verAgain = document.getElementById("verAgain");
+  var verReset = document.getElementById("verReset");
+  var verLost  = document.getElementById("verLost");
+  var verKept  = document.getElementById("verKept");
+  var verPosA  = document.getElementById("verPosA");
+  var verPosB  = document.getElementById("verPosB");
+
+  var idxA = 0, idxB = 0;
+
+  function verStrip(strip, cur, locked, onPick) {
+    strip.textContent = "";
+    VERSIONS.forEach(function (_, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "vdot" + (i === cur ? " is-now" : "");
+      b.textContent = String(i + 1);
+      b.disabled = locked(i);
+      b.setAttribute("aria-label", (i + 1) + "번째 버전" + (b.disabled ? " — 사라짐" : ""));
+      if (!b.disabled && onPick) b.addEventListener("click", function () { onPick(i); });
+      strip.appendChild(b);
+    });
+  }
+
+  function verPaint() {
+    verTextA.textContent = VERSIONS[idxA];
+    verTextB.textContent = VERSIONS[idxB];
+
+    // A는 현재 자리보다 앞선 것만 남는다. 지나간 자리는 잠긴 채로 보인다
+    verStrip(vstripA, idxA, function (i) { return i !== idxA; }, null);
+    verStrip(vstripB, idxB, function () { return false; }, function (i) {
+      idxB = i;
+      click(1650);
+      verPaint();
+    });
+
+    verLost.textContent = String(idxA);
+    verKept.textContent = String(VERSIONS.length);
+    verPosA.textContent = String(idxA + 1);
+    verPosB.textContent = String(idxB + 1);
+    verAgain.disabled = (idxA >= VERSIONS.length - 1);
+    verAgain.textContent = verAgain.disabled ? "더 없음" : "다시 생성";
+  }
+
+  verAgain.addEventListener("click", function () {
+    if (idxA >= VERSIONS.length - 1) return;
+    idxA++;
+    click(1200);
+    verPaint();
+  });
+
+  verReset.addEventListener("click", function () {
+    idxA = 0; idxB = 0;
+    click(1400);
+    verPaint();
+  });
+
+  verPaint();
+
+  var HEIGHT_REF = "fig1";        // 휠 판을 표본판의 기준 높이로 삼는다
+
   function lockPanelHeight() {
     if (!panelBox) return;
+    var ref = document.getElementById(HEIGHT_REF);
+    if (!ref) return;
+
     var was = panels.map(function (p) { return p.hidden; });
     var paperWas = paper.style.minHeight;
-    var tallest = 0;
 
     // 손잡이는 끝까지 늘렸을 때가 가장 높다 — 그 상태로 재야 나중에 넘치지 않는다
     paper.style.minHeight = (140 + (LEVELS.length - 1) * 46) + "px";
     panels.forEach(function (p) { p.style.minHeight = "0px"; });
 
-    panels.forEach(function (p) {
-      panels.forEach(function (q) { q.hidden = (q !== p); });
-      tallest = Math.max(tallest, p.offsetHeight);
-    });
+    panels.forEach(function (q) { q.hidden = (q !== ref); });
+    var refH = ref.offsetHeight;
 
     panels.forEach(function (p, i) {
       p.hidden = was[i];
-      p.style.minHeight = tallest + "px";
+      if (p.id !== "start") p.style.minHeight = refH + "px";
     });
     paper.style.minHeight = paperWas;
   }
@@ -1235,7 +1509,7 @@
     });
   });
 
-  // 시작 판의 목차에서 바로 해당 표본으로
+  // 들어가기 판의 목차에서 바로 해당 표본으로
   [].slice.call(document.querySelectorAll("[data-goto]")).forEach(function (b) {
     b.addEventListener("click", function () {
       for (var i = 0; i < panels.length; i++) {
