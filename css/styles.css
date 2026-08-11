@@ -23,6 +23,7 @@
   --ink-2:       #5E696E;
   --ink-3:       #8B979C;
   --line:        rgba(20, 24, 26, .14);
+  --line-faint:  rgba(20, 24, 26, .07);   /* 자리만 잡는 아주 옅은 선 */
   --line-2:      rgba(20, 24, 26, .30);
   --accent:      #0B7A91;          /* 본다이 블루 — iMac G3 */
   --accent-2:    #00A2C0;
@@ -54,6 +55,7 @@
     --ground: #0D1012; --ground-2: #101416; --surface: #15191C; --surface-2: #1D2327;
     --ink: #E7ECEE; --ink-2: #8B979C; --ink-3: #6B767B;
     --line: rgba(231,236,238,.13); --line-2: rgba(231,236,238,.28);
+    --line-faint: rgba(231,236,238,.07);
     --accent: #2FC6E2; --accent-2: #6FE0F2; --accent-wash: rgba(47,198,226,.12);
     --friction: #D2775E;
     --on-accent: #0D1012;
@@ -66,6 +68,7 @@
   --ground: #0D1012; --ground-2: #101416; --surface: #15191C; --surface-2: #1D2327;
   --ink: #E7ECEE; --ink-2: #8B979C; --ink-3: #6B767B;
   --line: rgba(231,236,238,.13); --line-2: rgba(231,236,238,.28);
+  --line-faint: rgba(231,236,238,.07);
   --accent: #2FC6E2; --accent-2: #6FE0F2; --accent-wash: rgba(47,198,226,.12);
   --friction: #D2775E;
   --on-accent: #0D1012;
@@ -75,6 +78,7 @@
   --ground: #EFF1F2; --ground-2: #E4E8EA; --surface: #FFFFFF; --surface-2: #E9EDEF;
   --ink: #14181A; --ink-2: #5E696E; --ink-3: #8B979C;
   --line: rgba(20,24,26,.14); --line-2: rgba(20,24,26,.30);
+  --line-faint: rgba(20,24,26,.07);
   --accent: #0B7A91; --accent-2: #00A2C0; --accent-wash: rgba(11,122,145,.10);
   --friction: #A85440;
   --on-accent: #FFFFFF;
@@ -183,7 +187,8 @@ h1.masthead__tag { font-size: .75rem; }
   top: 0;
   z-index: 30;
   background: var(--ground);
-  border-bottom: 1px solid var(--line-2);
+  /* 자리만 잡아주는 선 — 선택된 탭의 밑줄이 혼자 도드라지도록 아주 옅게 */
+  border-bottom: 1px solid var(--line-faint);
 }
 
 /* 한 줄짜리 바. 좁아지면 가로로 밀어서 고른다 */
@@ -203,10 +208,11 @@ h1.masthead__tag { font-size: .75rem; }
   justify-content: center;
   gap: 7px;
   padding: 11px 6px 12px;
-  margin-bottom: -1px;                /* 바의 하단 선 위에 표시선을 얹는다 */
+  /* 음수 마진을 쓰면 .tabs의 overflow-x:auto가 세로도 잘라 밑줄이 사라진다.
+     밑줄은 상자 안에 두고, 바의 옅은 선 바로 위에 놓이게 한다. */
   background: transparent;
   border: 0;
-  border-bottom: 2px solid transparent;
+  border-bottom: 1px solid transparent;   /* 바의 하단선과 같은 두께 */
   color: inherit;
   cursor: pointer;
   white-space: nowrap;
@@ -1342,7 +1348,7 @@ h1.masthead__tag { font-size: .75rem; }
    서명
    ============================================================ */
 .signature {
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--line-faint);   /* 탭 바 하단선과 같은 농도 */
   padding: 10px 0 14px;
   color: var(--ink-3);
   text-align: right;
