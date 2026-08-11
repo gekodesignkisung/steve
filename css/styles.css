@@ -187,14 +187,17 @@ h1.masthead__tag { font-size: .75rem; }
   top: 0;
   z-index: 30;
   background: var(--ground);
-  /* 자리만 잡아주는 선 — 선택된 탭의 밑줄이 혼자 도드라지도록 아주 옅게 */
-  border-bottom: 1px solid var(--line-faint);
 }
 
 /* 한 줄짜리 바. 좁아지면 가로로 밀어서 고른다 */
 .tabs {
   display: flex;
   overflow-x: auto;
+  /* 탭이 폭을 다 채우지 못해도 선이 이어지도록. 탭 밑줄과 같은 높이에 놓인다 */
+  background-image: linear-gradient(var(--line-faint), var(--line-faint));
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -212,7 +215,7 @@ h1.masthead__tag { font-size: .75rem; }
      밑줄은 상자 안에 두고, 바의 옅은 선 바로 위에 놓이게 한다. */
   background: transparent;
   border: 0;
-  border-bottom: 1px solid transparent;   /* 바의 하단선과 같은 두께 */
+  border-bottom: 1px solid var(--line-faint);   /* 선택되면 색만 바뀐다 */
   color: inherit;
   cursor: pointer;
   white-space: nowrap;
